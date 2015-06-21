@@ -11,7 +11,7 @@
  */
 class BitmapImage {
 public:
-
+   BitmapImage();
 private:
 };
 
