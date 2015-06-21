@@ -20,12 +20,17 @@ public:
    BitmapImage();
    ~BitmapImage();
 
+   //! \brief Copy constructor
+   BitmapImage(BitmapImage const& other);
    /*!
     * \brief Constructor from image filename
     *
     * \param filename a .ppm or a .pgm image
     */
    BitmapImage(std::string const& filename);
+
+   //! \brief Assignment operator
+   BitmapImage const& operator=(BitmapImage const& rhs);
 
    //! \brief Number of rows in the image
    int rows() const { return _rows; }
@@ -35,6 +40,16 @@ public:
    int channels() const { return _channels; }
    //! \brief Number of bytes in a row of pixels
    int rowWidth() const { return _rowWidth; }
+
+   /*!
+    * \brief Resize the image
+    *
+    * Destructively resize the image.
+    * \param nRows number of rows
+    * \param nCols number of columns
+    * \param nChans number of channels
+    */
+   void resize(int nRows, int nCols, int nChans);
 
    /*!
     * \brief Save the file
@@ -50,6 +65,20 @@ public:
    uint8_t* operator[](size_t i) { return _data + i*_rowWidth; }
    //! \brief Pointer to the ith row of pixel data (const version)
    uint8_t const* operator[](size_t i) const { return _data + i*_rowWidth; }
+
+   /*!
+    * \brief Extract a patch from the image
+    *
+    * If the specified region is outside the image boundary, the output is a
+    * size 0 image.
+    *
+    * \param[out] out the output patch
+    * \param[in] left the left boundary
+    * \param[in] right the right boundary
+    * \param[in] top the upper boundary
+    * \param[in] bottom the lower boundary
+    */
+   void patch(BitmapImage& out, int left, int right, int top, int bottom);
 private:
 
    uint8_t* _data;

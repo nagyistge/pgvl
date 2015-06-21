@@ -20,6 +20,20 @@ BitmapImage::~BitmapImage() {
    delete[] _unalignedData;
 }
 
+BitmapImage::BitmapImage(BitmapImage const& other) :
+   _data(0),
+   _unalignedData(0),
+   _rows(0),
+   _cols(0),
+   _channels(0),
+   _rowWidth(0)
+{
+   resize(other._rows, other._cols, other._channels);
+   for( int i = 0; i < _rows; ++i ) {
+      memcpy(_data + i*_rowWidth, other._data + i*other._rowWidth, _channels*_cols);
+   }
+}
+
 BitmapImage::BitmapImage(std::string const& filename) :
    _data(0),
    _unalignedData(0),
@@ -64,6 +78,38 @@ BitmapImage::BitmapImage(std::string const& filename) :
    delete[] rawData;
 }
 
+BitmapImage const& BitmapImage::operator=(BitmapImage const& rhs) {
+   // Don't self-assign
+   if( this == &rhs )
+      return *this;
+
+   resize(rhs._rows, rhs._cols, rhs._channels);
+   for( int i = 0; i < _rows; ++i ) {
+      memcpy(_data + i*_rowWidth, rhs._data + i*rhs._rowWidth, _channels*_cols);
+   }
+
+   return *this;
+}
+
+void BitmapImage::resize(int row, int col, int chan) {
+   delete[] _unalignedData;
+
+   _rows = row;
+   _cols = col;
+   _channels = chan;
+
+   // Make the row width a multiple of CACHE_LINE_SIZE
+   _rowWidth = _channels*_cols;
+   if( _rowWidth % CACHE_LINE_SIZE )
+      _rowWidth += CACHE_LINE_SIZE - (_rowWidth % CACHE_LINE_SIZE);
+
+   // Make each row line up with CACHE_LINE_SIZE
+   _unalignedData = new uint8_t[_rowWidth*_rows + CACHE_LINE_SIZE];
+   _data = _unalignedData;
+   if( reinterpret_cast<size_t>(_data) % CACHE_LINE_SIZE )
+      _data += CACHE_LINE_SIZE - (reinterpret_cast<size_t>(_data) % CACHE_LINE_SIZE);
+}
+
 void BitmapImage::save(std::string const& basename) const {
    uint8_t* rawData = new uint8_t[_rows*_cols*_channels];
 
@@ -90,6 +136,23 @@ void BitmapImage::save(std::string const& basename) const {
    }
 
    delete[] rawData;
+}
+
+void BitmapImage::patch(BitmapImage& out, int left, int right, int top, int bottom) {
+   if( left > right ||
+       top > bottom ||
+       left < 0 ||
+       right >= _cols ||
+       top < 0 ||
+       bottom >= _rows ) {
+      out.resize(0,0,0);
+      return;
+   }
+
+   out.resize(bottom-top+1, right-left+1, _channels);
+   for(int i = top; i <= bottom; ++i) {
+      memcpy(out._data + (i-top)*out._rowWidth, _data + i*_rowWidth + left*_channels, (right-left+1)*_channels);
+   }
 }
 
 BitmapImage::FileType BitmapImage::fileType(std::string const& filename) {
