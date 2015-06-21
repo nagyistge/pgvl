@@ -3,7 +3,8 @@
 
 #include <gtest/gtest.h>
 #include "config.h"
-#include "ppm.h"
+#include <ppm.h>
+#include <BitmapImage.h>
 
 class BitmapImageTest : public testing::Test {
 public:
@@ -42,6 +43,22 @@ TEST_F(BitmapImageTest, loadsPpm) {
    EXPECT_EQ( maxval, 255 );
    
    delete[] data;
+}
+
+// Test BitmapImage loading
+TEST_F(BitmapImageTest, loadsBitmapImage) {
+   int w = 0;
+   int h = 0;
+   int maxval = 0;
+   BitmapImage ppm(TEST_IMAGE_DIR "lena.ppm");
+
+   EXPECT_EQ( ppm.rows(), 512 );
+   EXPECT_EQ( ppm.cols(), 512 );
+
+   BitmapImage pgm(TEST_IMAGE_DIR "lena_gray.pgm");
+
+   EXPECT_EQ( pgm.rows(), 512 );
+   EXPECT_EQ( pgm.cols(), 512 );
 }
 
 #endif /*BITMAPIMAGETEST_H*/

@@ -8,9 +8,9 @@ ADD_EXECUTABLE( pgvl_tests
 
 # Fails to compile without pthread
 FIND_PACKAGE(Threads REQUIRED)
-TARGET_LINK_LIBRARIES(pgvl_tests ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+TARGET_LINK_LIBRARIES(pgvl_tests pgvl ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
 ADD_TEST(
    NAME BitmapImageTest
-   COMMAND pgvl_tests
+   COMMAND pgvl_tests --gtest_filter=BitmapImageTest*
 )

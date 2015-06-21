@@ -4,6 +4,7 @@
 
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 /*!
  * \brief Reads a binary or ascii PGM (grayscale image) file.

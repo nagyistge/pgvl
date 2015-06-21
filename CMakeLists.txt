@@ -18,28 +18,21 @@ INCLUDE_DIRECTORIES( ${GTEST_INCLUDE_DIR} )
 ENABLE_TESTING()
 
 #===========Set release/debug settings==========
-IF( CMAKE_COMPILER_IS_GNUCXX )
-   SET( CMAKE_CXX_FLAGS_DEBUG "-g3 -Wall -Wno-sign-compare" )
-   SET( LINK_FLAGS_DEBUG "-rdynamic" )
-   SET( CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -Wno-deprecated -Wno-sign-compare" )
-   SET( LINK_FLAGS_RELEASE "-rdynamic" )
-   IF( DO_PROFILING )
-      SET( CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -pg" )
-      SET( CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -pg" )
-   ENDIF()
+
+SET( CMAKE_CXX_FLAGS_DEBUG "-g3 -Wall -Wno-sign-compare" )
+SET( LINK_FLAGS_DEBUG "-rdynamic" )
+SET( CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -Wno-deprecated -Wno-sign-compare" )
+SET( LINK_FLAGS_RELEASE "-rdynamic" )
+IF( DO_PROFILING )
+   SET( CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -pg" )
+   SET( CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -pg" )
 ENDIF()
 
 # C++11
-IF( CMAKE_COMPILER_IS_GNUCXX )
-   SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11" )
-ENDIF()
+SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11" )
 
 # OpenMP
-IF( CMAKE_COMPILER_IS_GNUCXX )
-   SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp" )
-#ELSEIF( MSVC )
-#   SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /openmp" )
-ENDIF()
+SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp" )
 
 IF( CMAKE_BUILD_TYPE STREQUAL "Release" )
   # This definition disables the assert() macro.
