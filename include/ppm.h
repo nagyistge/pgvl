@@ -76,7 +76,7 @@ unsigned char* pgmread(const char* filename, int* w, int* h)
     
     numpix = (*w)*(*h);
     
-    if ((data = (unsigned char*)calloc(numpix, sizeof(unsigned char*))) == NULL)
+    if ((data = new unsigned char[numpix]()) == NULL)
     {
       printf("Memory allocation error. Exit program");
       exit(1);
@@ -227,7 +227,7 @@ unsigned char* ppmread(const char* filename, int* w, int* h, int* maxval)
     
     numpix = (*w)*(*h);
     
-    if ((data = (unsigned char*)calloc(numpix*3, sizeof(unsigned char*))) == NULL)
+    if ((data = new unsigned char[numpix*3]()) == NULL)
     {
       printf("Memory allocation error. Exit program");
       exit(1);
