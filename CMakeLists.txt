@@ -2,7 +2,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.0.0)
 PROJECT(
    pgvl
    VERSION 0.1.0
-   LANGUAGES CXX
+   LANGUAGES CXX C
 )
 
 #==============Set Directories=================
@@ -57,3 +57,4 @@ INCLUDE_DIRECTORIES( "${CMAKE_CURRENT_SOURCE_DIR}/include" )
 #=============Process Subdirectories============
 ADD_SUBDIRECTORY( "doc/" )
 ADD_SUBDIRECTORY( "src/" )
+ADD_SUBDIRECTORY( "tests/" )

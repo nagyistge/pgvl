@@ -1,0 +1,16 @@
+SET( PGVL_TEST_SRCS
+   BitmapImageTest.cpp
+)
+
+ADD_EXECUTABLE( pgvl_tests
+   ${PGVL_TEST_SRCS}
+)
+
+# Fails to compile without pthread
+FIND_PACKAGE(Threads REQUIRED)
+TARGET_LINK_LIBRARIES(pgvl_tests ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+
+ADD_TEST(
+   NAME BitmapImageTest
+   COMMAND pgvl_tests
+)

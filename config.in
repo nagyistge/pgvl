@@ -1,4 +1,6 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#define TEST_IMAGE_DIR "${PROJECT_SOURCE_DIR}/tests/images/"
+
 #endif /*CONFIG_H*/

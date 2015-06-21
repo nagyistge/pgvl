@@ -15,7 +15,7 @@
  *          function has responsibility to delete[] the memory. A NULL is returned
  *          in the case of failure.
  */
-unsigned char* pgmread(char* filename, int* w, int* h)
+unsigned char* pgmread(const char* filename, int* w, int* h)
 {
     FILE* file;
     char line[256];
@@ -117,7 +117,7 @@ unsigned char* pgmread(char* filename, int* w, int* h)
  * 
  * \sa pgmread()
  */
-float* pgmread_float(char* filename, int* w, int* h )
+float* pgmread_float(const char* filename, int* w, int* h )
 {
    int i, numpix;
    unsigned char* cdata;
@@ -161,7 +161,7 @@ unsigned char* rgbToArgb(unsigned char* rgb, int w, int h)
  *          function has responsibility to delete[] the memory. A NULL is returned
  *          in the case of failure.
  */
-unsigned char* ppmread(char* filename, int* w, int* h, int* maxval)
+unsigned char* ppmread(const char* filename, int* w, int* h, int* maxval)
 {
     FILE* file;
     char line[256];
@@ -268,7 +268,7 @@ unsigned char* ppmread(char* filename, int* w, int* h, int* maxval)
  * 
  * \sa ppmread()
  */
-float* ppmread_float(char* filename, int* w, int* h )
+float* ppmread_float(const char* filename, int* w, int* h )
 {
    int maxval;
    int i, numpix;
@@ -297,7 +297,7 @@ float* ppmread_float(char* filename, int* w, int* h )
  * \param binsave 1 for binary writing, 0 for text writing
  */
 int pgmwrite(
-   char* filename,
+   const char* filename,
    int w, int h,
    unsigned char* data, 
    const char* comment_string,
@@ -382,7 +382,7 @@ int pgmwrite(
  * \param binsave 1 for binary writing, 0 for text writing
  */
 int pgmwrite_float(
-   char* filename,
+   const char* filename,
    int w, int h,
    float* data, 
    const char* comment_string,
