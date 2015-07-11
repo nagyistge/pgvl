@@ -6,7 +6,7 @@
 #include <iostream>
 #include <stdlib.h>
 
-BitmapImage::BitmapImage() :
+BitmapImage::BitmapImage(int rows, int cols, int channels) :
    _data(0),
    _unalignedData(0),
    _rows(0),
@@ -14,6 +14,7 @@ BitmapImage::BitmapImage() :
    _channels(0),
    _rowWidth(0)
 {
+   resize(rows, cols, channels);
 }
 
 BitmapImage::~BitmapImage() {
@@ -93,6 +94,7 @@ BitmapImage const& BitmapImage::operator=(BitmapImage const& rhs) {
 
 void BitmapImage::resize(int row, int col, int chan) {
    delete[] _unalignedData;
+   _unalignedData = 0;
 
    _rows = row;
    _cols = col;

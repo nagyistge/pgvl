@@ -1,5 +1,6 @@
 SET( PGVL_TEST_SRCS
    BitmapImageTest.cpp
+   ImageProcessingTest.cpp
 )
 
 ADD_EXECUTABLE( pgvl_tests
@@ -13,4 +14,9 @@ TARGET_LINK_LIBRARIES(pgvl_tests pgvl ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIB
 ADD_TEST(
    NAME BitmapImageTest
    COMMAND pgvl_tests --gtest_filter=BitmapImageTest*
+)
+
+ADD_TEST(
+   NAME ImageProcessingTest
+   COMMAND pgvl_tests --gtest_filter=ImageProcessingTest*
 )

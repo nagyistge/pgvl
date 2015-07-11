@@ -17,7 +17,7 @@
 class BitmapImage {
 public:
    //! \brief Default constructor
-   BitmapImage();
+   BitmapImage(int rows = 0, int cols = 0, int channels = 0);
    ~BitmapImage();
 
    //! \brief Copy constructor
