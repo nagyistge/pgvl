@@ -24,13 +24,13 @@ TEST_F(ImageProcessingTest, integrate) {
    // [ 0  1  2 |  3  4  5 |  6  7  8
    //   9 10 11 | 12 13 14 | 15 16 17
    //  18 19 20 | 21 22 23 | 24 25 26]
-   BitmapImage img(rows, cols, chans);
+   BitmapImage<uint8_t> img(rows, cols, chans);
    for( i = 0; i < rows; ++i )
       for( j = 0; j < cols*chans; ++j )
          img[i][j] = j + i*cols*chans;
 
    // Brute-force calculate expected integral image
-   BitmapImage expectedIntImg(img);
+   BitmapImage<uint8_t> expectedIntImg(img);
    for( j = chans; j < cols*chans; ++j )
       expectedIntImg[0][j] += expectedIntImg[0][j-chans];
    for( i = 1; i < rows; ++i ) {

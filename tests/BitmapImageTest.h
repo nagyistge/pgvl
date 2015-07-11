@@ -47,12 +47,12 @@ TEST_F(BitmapImageTest, loadsPpm) {
 
 // Test BitmapImage loading
 TEST_F(BitmapImageTest, loadsBitmapImage) {
-   BitmapImage ppm(TEST_IMAGE_DIR "lena.ppm");
+   BitmapImage<uint8_t> ppm(TEST_IMAGE_DIR "lena.ppm");
 
    EXPECT_EQ( ppm.rows(), 512 );
    EXPECT_EQ( ppm.cols(), 512 );
 
-   BitmapImage pgm(TEST_IMAGE_DIR "lena_gray.pgm");
+   BitmapImage<uint8_t> pgm(TEST_IMAGE_DIR "lena_gray.pgm");
 
    EXPECT_EQ( pgm.rows(), 512 );
    EXPECT_EQ( pgm.cols(), 512 );
@@ -60,9 +60,9 @@ TEST_F(BitmapImageTest, loadsBitmapImage) {
 
 // Ensure saving then loading results in the same data
 TEST_F(BitmapImageTest, loadStore) {
-   BitmapImage lena(TEST_IMAGE_DIR "lena_gray.pgm");
+   BitmapImage<uint8_t> lena(TEST_IMAGE_DIR "lena_gray.pgm");
    lena.save("/tmp/pgvl-lena");
-   BitmapImage lena2("/tmp/pgvl-lena.pgm");
+   BitmapImage<uint8_t> lena2("/tmp/pgvl-lena.pgm");
 
    EXPECT_EQ( lena.rows(), lena2.rows() );
    EXPECT_EQ( lena.cols(), lena2.cols() );
@@ -83,8 +83,8 @@ TEST_F(BitmapImageTest, loadStore) {
 
 // Ensure saving then loading results in the same data
 TEST_F(BitmapImageTest, patch) {
-   BitmapImage lena(TEST_IMAGE_DIR "lena_gray.pgm");
-   BitmapImage patch;
+   BitmapImage<uint8_t> lena(TEST_IMAGE_DIR "lena_gray.pgm");
+   BitmapImage<uint8_t> patch;
 
    lena.patch(patch, 1, 5, 1, 5);
 

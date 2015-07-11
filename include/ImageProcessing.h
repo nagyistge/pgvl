@@ -15,6 +15,24 @@
  *
  * \param[in,out] img the input image and output integral image
  */
-void integrate(BitmapImage& img);
+template<class T>
+void integrate(BitmapImage<T>& img) {
+   int i,j;
+   int const channels = img.channels();
+
+   // Prefix scan all the rows
+#pragma omp parallel for shared(img) private(i,j)
+   for( i = 0; i < img.rows(); ++i ) {
+      for( j = channels; j < img.rowWidth(); ++j )
+         img[i][j] += img[i][j-channels];
+   }
+
+   // Prefix scan all the columns
+#pragma omp parallel for shared(img) private(i,j)
+   for( j = 0; j < img.rowWidth(); ++j ) {
+      for( i = 1; i < img.rows(); ++i )
+         img[i][j] += img[i-1][j];
+   }
+}
 
 #endif /*IMAGEPROCESSING_H*/
