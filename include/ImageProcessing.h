@@ -9,6 +9,12 @@
 #include <BitmapImage.h>
 
 /*!
+ * \defgroup ImageProcessing Image Processing
+ * \brief All the basic image processing functionality
+ */
+
+/*!
+ * \ingroup ImageProcessing
  * \brief Create an integral image
  *
  * For now, purposefully ignores overflowing
@@ -36,6 +42,7 @@ void integrate(BitmapImage<T>& img) {
 }
 
 /*!
+ * \ingroup ImageProcessing
  * \brief Create a squared integral image
  *
  * For now, purposefully ignores overflowing
