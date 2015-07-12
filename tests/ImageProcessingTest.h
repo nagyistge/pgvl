@@ -48,4 +48,33 @@ TEST_F(ImageProcessingTest, integrate) {
          EXPECT_EQ( img[i][j], expectedIntImg[i][j] );
 }
 
+TEST_F(ImageProcessingTest, integrateSquare) {
+   int i,j;
+   int const rows = 2;
+   int const cols = 3;
+   int const chans = 1;
+
+   // img:
+   // [ 0  1  2
+   //   3  4  5 ]
+   BitmapImage<uint8_t> img(rows, cols, chans);
+   for( i = 0; i < rows; ++i )
+      for( j = 0; j < cols*chans; ++j )
+         img[i][j] = j + i*cols*chans;
+
+   // img^2:
+   // [ 0  1  4
+   //   9 16 25 ]
+
+   // Row prefix
+   // [ 0  1  5
+   //   9 25 50 ]
+
+   // Col prefix
+   // [ 0  1  5
+   //   9 26 55 ]
+   integrateSquare(img);
+   EXPECT_EQ( 0 + 1 + 4 + 9 + 16 + 25, img[1][2] );
+}
+
 #endif /*IMAGEPROCESSINGTEST_H*/
