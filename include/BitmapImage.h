@@ -6,6 +6,7 @@
 #ifndef BITMAPIMAGE_H
 #define BITMAPIMAGE_H
 
+#include <functional>
 #include <string>
 #include <regex>
 #include <inttypes.h>
@@ -58,6 +59,22 @@ public:
          memcpy(_data + i*_rowWidth, other._data + i*other._rowWidth, _channels*_cols);
       }
    }
+
+   //! \brief Move constructor
+   BitmapImage(BitmapImage&& other) :
+      _data( other._data ),
+      _unalignedData( other._unalignedData ),
+      _channelWidth(other._channelWidth),
+      _rows(other._rows),
+      _cols(other._cols),
+      _channels(other._channels),
+      _rowWidth(other._rowWidth)
+   {
+      // Kill the other pointers so that its destructor does not free the
+      // memory we now own.
+      other._data = other._unalignedData = 0;
+   }
+
    /*!
     * \brief Constructor from image filename
     *
@@ -109,8 +126,7 @@ public:
    }
 
    //! \brief Assignment operator
-   BitmapImage<T>& operator=(BitmapImage<T> const& rhs)
-   {
+   BitmapImage<T>& operator=(BitmapImage<T> const& rhs) {
       // Don't self-assign
       if( this == &rhs )
          return *this;
@@ -118,6 +134,43 @@ public:
       resize(rhs._rows, rhs._cols, rhs._channels);
       for( int i = 0; i < _rows; ++i ) {
          memcpy(_data + i*_rowWidth, rhs._data + i*rhs._rowWidth, _channels*_cols);
+      }
+
+      return *this;
+   }
+
+   //! \brief Conversion assignment
+   template<class U>
+   BitmapImage<T>& operator=(BitmapImage<U> const& rhs) {
+      convertFrom(rhs);
+      return *this;
+   }
+
+   /*!
+    * \brief Conversion assignment
+    *
+    * Converts a BitmapImage containing another type
+    *
+    * \tparam U the contained type of the image to convert
+    * \param rhs the image to convert
+    * \param elementConversion function that converts \c U to \c T
+    */
+   template<class U>
+   void convertFrom(
+      BitmapImage<U> const& rhs,
+      std::function<T(U)> elementConversion = [](U u) -> T {return static_cast<T>(u);} ) {
+      // Don't self-assign
+      if( this == &rhs )
+         return *this;
+
+      BitmapImage<T>& me = *this;
+
+      resize(rhs._rows, rhs._cols, rhs._channels);
+#pragma omp parallel for shared(me, rhs, elementConversion)
+      for( int i = 0; i < _rows; ++i ) {
+         for( int j = 0; j < _cols*_channels; ++j ) {
+            me[i][j] = elementConversion(rhs[i][j]);
+         }
       }
 
       return *this;
