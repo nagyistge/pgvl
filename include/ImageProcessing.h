@@ -7,6 +7,7 @@
 #define IMAGEPROCESSING_H
 
 #include <BitmapImage.h>
+#include <Point.h>
 
 /*!
  * \defgroup ImageProcessing Image Processing
@@ -74,6 +75,65 @@ void integrateSquare(BitmapImage<T>& img) {
    for( j = 0; j < img.rowWidth(); ++j ) {
       for( i = 1; i < img.rows(); ++i )
          img[i][j] += img[i-1][j];
+   }
+}
+
+/*!
+ * \ingroup ImageProcessing
+ * \brief Filter an image with a kernel
+ *
+ * \note This does not do convolution, but correlation
+ * \note For now, only does non-fft filtering
+ *
+ * \param out The output of the filtering
+ * \param img Image to be filtered
+ * \param kernel Kernel to apply to the \c img
+ * \param anchor point within the kernel considered to be the center. If left
+ *        at its default value, the anchor will be set to the center of the kernel.
+ * \param delta value to add to the filtered value before storing in \c out
+ */
+template<class T>
+void filter(
+   BitmapImage<T>& out,
+   BitmapImage<T> const& img,
+   BitmapImage<T> const& kernel,
+   Point const& anchor = Point(-1,-1),
+   float delta = 0.f
+) {
+   int const kcols = kernel.cols();
+   int const krows = kernel.rows();
+
+   int const rows = out.rows();
+   int const cols = out.cols();
+   int const channels = out.channels();
+
+   int const anchorRow = (anchor==Point(-1,-1)) ? krows/2 : anchor.y;
+   int const anchorCol = (anchor==Point(-1,-1)) ? kcols/2 : anchor.x;
+
+   // Indices must always be valid:
+   // img row: i + m - anchorRow
+   // img col: j + n - anchorCol
+   //
+   // i + m - anchorRow >= 0:   i >= anchorRow
+   // i + m - anchorRow < rows: i < rows + anchorRow - (krows-1)
+
+   int i,j,k;
+   int m,n;
+   for( i = anchorRow; i < rows + anchorRow - krows + 1; ++i ) {
+      for( j = anchorCol; j < cols + anchorCol - kcols + 1; ++j ) {
+         for( k = 0; k < out.channels(); ++k ) {
+            T& sum = out[i][j*channels + k];
+
+            //sum = 0;
+            // NOTE: is this the right place to apply the delta?
+            sum = delta;
+            for( m = 0; m < krows; ++m ) {
+               for( n = 0; n < kcols; ++n ) {
+                  sum += kernel[m][n*channels + k] * img[i+ m-anchorRow][(j+n-anchorCol)*channels + k];
+               }
+            }
+         }
+      }
    }
 }
 

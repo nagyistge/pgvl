@@ -77,4 +77,37 @@ TEST_F(ImageProcessingTest, integrateSquare) {
    EXPECT_EQ( 0 + 1 + 4 + 9 + 16 + 25, img[1][2] );
 }
 
+TEST_F(ImageProcessingTest, filter) {
+
+   // img:
+   // [ 1 2 3
+   //   9 6 5 ]
+
+   // kern:
+   // [ -1 0 1 ]
+
+   // out:
+   // [ 0  2 0
+   //   0 -4 0 ]
+
+   BitmapImage<int8_t> img(2,3,1);
+   img[0][0] = 1;
+   img[0][1] = 2;
+   img[0][2] = 3;
+   img[1][0] = 9;
+   img[1][1] = 6;
+   img[1][2] = 5;
+
+   BitmapImage<int8_t> kern(1,3,1);
+   kern[0][0] = -1;
+   kern[0][1] = 0;
+   kern[0][2] = 1;
+
+   BitmapImage<int8_t> out(2,3,1);
+
+   filter(out, img, kern);
+   EXPECT_EQ(out[0][1], 2);
+   EXPECT_EQ(out[1][1], -4);
+}
+
 #endif /*IMAGEPROCESSINGTEST_H*/
