@@ -6,6 +6,7 @@
 #ifndef IMAGEPROCESSING_H
 #define IMAGEPROCESSING_H
 
+#include <cmath>
 #include <BitmapImage.h>
 #include <Point.h>
 
@@ -92,11 +93,11 @@ void integrateSquare(BitmapImage<T>& img) {
  *        at its default value, the anchor will be set to the center of the kernel.
  * \param delta value to add to the filtered value before storing in \c out
  */
-template<class T>
+template<class T, class U>
 void filter(
    BitmapImage<T>& out,
    BitmapImage<T> const& img,
-   BitmapImage<T> const& kernel,
+   BitmapImage<U> const& kernel,
    Point const& anchor = Point(-1,-1),
    float delta = 0.f
 ) {
@@ -135,6 +136,68 @@ void filter(
          }
       }
    }
+}
+
+/*!
+ * \ingroup ImageProcessing
+ * \brief A 2D Gaussian function
+ *
+ * \tparam T the type of the x and y coordinates
+ * \returns function float(T x, T y, T muX, T muY, T sigmaX, T sigmaY, T theta)
+ *          where (x,y) are the coordinates, (muX,muY) are the means,
+ *          (sigmaX,sigmaY) are the standard deviations, and theta is the angle
+ */
+template<class T>
+std::function<float(T,T,T,T,T,T,float)> gauss() {
+   return [](T x, T y, T muX, T muY, T sigmaX, T sigmaY, float theta) -> float {
+      float const cosTheta = cosf(theta);
+      float const sinTheta = sinf(theta);
+      float const sin2Theta = sinf(2*theta);
+
+      float const a = cosTheta*cosTheta/(2*sigmaX*sigmaX) + sinTheta*sinTheta/(2*sigmaY*sigmaY);
+      float const b = -sin2Theta/(4*sigmaX*sigmaX) + sin2Theta/(4*sigmaY*sigmaY);
+      float const c = sinTheta*sinTheta/(2*sigmaX*sigmaX) + cosTheta*cosTheta/(2*sigmaY*sigmaY);
+
+      return expf( -(a*(x-muX)*(x-muX) + 2*b*(x-muX)*(y-muY) + c*(y-muY)*(y-muY)) );
+   };
+}
+
+/*!
+ * \ingroup ImageProcessing
+ * \brief Image lowpass filtering
+ *
+ * \param[out] out output image
+ * \param[in] img input image
+ * \param[in] radius spatial radius in pixels of the lowpass filter
+ */
+template<class T>
+void lowpassFilter(BitmapImage<T>& out, BitmapImage<T> const& img, int radius) {
+   auto kFunc = gauss<int>();
+   int const kSize = radius % 2 == 0 ? 3*radius+1 : 3*radius;
+   int const kCenter = kSize/2;
+   int const kStd = radius/2;
+
+   int const chans = img.channels();
+   BitmapImage<float> kernelX(1,kSize,img.channels());
+   BitmapImage<float> kernelY(kSize,1,img.channels());
+   float sum = 0.f;
+   float val;
+   for(int i = 0; i < kSize; ++i) {
+      val = kFunc(i, 0, kCenter, 0, kStd, 1, 0.f);
+      sum += val;
+      for(int k = 0; k < chans; ++k)
+         kernelX[0][i*chans+k] = kernelY[i][k] = val;
+   }
+   for(int i = 0; i < kSize; ++i) {
+      for(int k = 0; k < chans; ++k) {
+         kernelX[0][i*chans+k] /= sum;
+         kernelY[i][k] /= sum;
+      }
+   }
+
+   BitmapImage<T> tmp(img.rows(), img.cols(), img.channels());
+   filter(tmp, img, kernelX);
+   filter(out, tmp, kernelY);
 }
 
 #endif /*IMAGEPROCESSING_H*/

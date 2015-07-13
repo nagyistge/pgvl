@@ -110,4 +110,13 @@ TEST_F(ImageProcessingTest, filter) {
    EXPECT_EQ(out[1][1], -4);
 }
 
+TEST_F(ImageProcessingTest, lowpassFilter) {
+   BitmapImage<uint8_t> lena(TEST_IMAGE_DIR "lena_gray.pgm");
+
+   BitmapImage<uint8_t> lpf(lena.rows(), lena.cols(), lena.channels());
+   lowpassFilter(lpf, lena, 4);
+
+   lpf.save("/tmp/lena_lpf");
+}
+
 #endif /*IMAGEPROCESSINGTEST_H*/

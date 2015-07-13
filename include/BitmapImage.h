@@ -39,6 +39,7 @@ public:
      _rowWidth(0)
    {
       resize(rows, cols, channels);
+      memset(_data, 0x00, rowWidth()*rows);
    }
    ~BitmapImage() {
       delete[] _unalignedData;
