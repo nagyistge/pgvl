@@ -17,13 +17,21 @@ FIND_PACKAGE( GTest REQUIRED )
 INCLUDE_DIRECTORIES( ${GTEST_INCLUDE_DIR} )
 ENABLE_TESTING()
 
+#=================Options=======================
+
+OPTION(
+   DO_PROFILING
+   "Build with profiling flags set"
+   OFF
+)
+
 #===========Set release/debug settings==========
 
 SET( CMAKE_CXX_FLAGS_DEBUG "-g3 -Wall -Wno-sign-compare" )
 SET( LINK_FLAGS_DEBUG "-rdynamic" )
 SET( CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -Wno-deprecated -Wno-sign-compare" )
 SET( LINK_FLAGS_RELEASE "-rdynamic" )
-IF( DO_PROFILING )
+IF( ${DO_PROFILING} )
    SET( CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -pg" )
    SET( CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -pg" )
 ENDIF()

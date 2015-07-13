@@ -120,6 +120,7 @@ void filter(
 
    int i,j,k;
    int m,n;
+#pragma omp parallel for shared(out,img,kernel) private(i,j,k,m,n)
    for( i = anchorRow; i < rows + anchorRow - krows + 1; ++i ) {
       for( j = anchorCol; j < cols + anchorCol - kcols + 1; ++j ) {
          for( k = 0; k < out.channels(); ++k ) {
