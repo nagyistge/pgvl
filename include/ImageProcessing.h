@@ -123,7 +123,7 @@ void filter(
 #pragma omp parallel for shared(out,img,kernel) private(i,j,k,m,n)
    for( i = anchorRow; i < rows + anchorRow - krows + 1; ++i ) {
       for( j = anchorCol; j < cols + anchorCol - kcols + 1; ++j ) {
-         for( k = 0; k < out.channels(); ++k ) {
+         for( k = 0; k < channels; ++k ) {
             T& sum = out[i][j*channels + k];
 
             //sum = 0;
@@ -173,12 +173,15 @@ void filter(
 #pragma omp parallel for shared(out,img,kernel) private(i,j,k,m,n)
    for( i = anchorRow; i < rows + anchorRow - krows + 1; ++i ) {
       for( j = anchorCol; j < cols + anchorCol - kcols + 1; ++j ) {
-         for( k = 0; k < out.channels(); ++k ) {
+         for( k = 0; k < channels; ++k ) {
             // NOTE: is this the right place to apply the delta?
             int sum = delta;
             for( m = 0; m < krows; ++m ) {
                for( n = 0; n < kcols; ++n ) {
-                  sum += static_cast<int>(kernel[m][n*channels + k]) * img[i+ m-anchorRow][(j+n-anchorCol)*channels + k];
+                  int a = kernel[m][n*channels + k];
+                  // TODO: this line causes a lot of L1 misses
+                  int b = img[i+m-anchorRow][(j+n-anchorCol)*channels + k];
+                  sum += a*b;
                }
             }
             // Assume that 255 in the kernel corresponds to 1.0
