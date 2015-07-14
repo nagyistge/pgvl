@@ -141,6 +141,55 @@ void filter(
 
 /*!
  * \ingroup ImageProcessing
+ * \brief Specialization for uint8_t images
+ */
+template<>
+void filter(
+   BitmapImage<uint8_t>& out,
+   BitmapImage<uint8_t> const& img,
+   BitmapImage<uint8_t> const& kernel,
+   Point const& anchor,
+   float delta
+) {
+   int const kcols = kernel.cols();
+   int const krows = kernel.rows();
+
+   int const rows = out.rows();
+   int const cols = out.cols();
+   int const channels = out.channels();
+
+   int const anchorRow = (anchor==Point(-1,-1)) ? krows/2 : anchor.y;
+   int const anchorCol = (anchor==Point(-1,-1)) ? kcols/2 : anchor.x;
+
+   // Indices must always be valid:
+   // img row: i + m - anchorRow
+   // img col: j + n - anchorCol
+   //
+   // i + m - anchorRow >= 0:   i >= anchorRow
+   // i + m - anchorRow < rows: i < rows + anchorRow - (krows-1)
+
+   int i,j,k;
+   int m,n;
+#pragma omp parallel for shared(out,img,kernel) private(i,j,k,m,n)
+   for( i = anchorRow; i < rows + anchorRow - krows + 1; ++i ) {
+      for( j = anchorCol; j < cols + anchorCol - kcols + 1; ++j ) {
+         for( k = 0; k < out.channels(); ++k ) {
+            // NOTE: is this the right place to apply the delta?
+            int sum = delta;
+            for( m = 0; m < krows; ++m ) {
+               for( n = 0; n < kcols; ++n ) {
+                  sum += static_cast<int>(kernel[m][n*channels + k]) * img[i+ m-anchorRow][(j+n-anchorCol)*channels + k];
+               }
+            }
+            // Assume that 255 in the kernel corresponds to 1.0
+            out[i][j*channels + k] = sum / 255;
+         }
+      }
+   }
+}
+
+/*!
+ * \ingroup ImageProcessing
  * \brief A 2D Gaussian function
  *
  * \tparam T the type of the x and y coordinates
@@ -172,7 +221,11 @@ std::function<float(T,T,T,T,T,T,float)> gauss() {
  * \param[in] radius spatial radius in pixels of the lowpass filter
  */
 template<class T>
-void lowpassFilter(BitmapImage<T>& out, BitmapImage<T> const& img, int radius) {
+void lowpassFilter(
+   BitmapImage<T>& out,
+   BitmapImage<T> const& img,
+   int radius
+) {
    auto kFunc = gauss<int>();
    int const kSize = radius % 2 == 0 ? 3*radius+1 : 3*radius;
    int const kCenter = kSize/2;
@@ -197,6 +250,45 @@ void lowpassFilter(BitmapImage<T>& out, BitmapImage<T> const& img, int radius) {
    }
 
    BitmapImage<T> tmp(img.rows(), img.cols(), img.channels());
+   filter(tmp, img, kernelX);
+   filter(out, tmp, kernelY);
+}
+
+/*!
+ * \ingroup ImageProcessing
+ * \brief Specialization for uint8_t images
+ */
+template<>
+void lowpassFilter(
+   BitmapImage<uint8_t>& out,
+   BitmapImage<uint8_t> const& img,
+   int radius
+) {
+   auto kFunc = gauss<int>();
+   int const kSize = radius % 2 == 0 ? 3*radius+1 : 3*radius;
+   int const kCenter = kSize/2;
+   int const kStd = radius/2;
+
+   int const chans = img.channels();
+   BitmapImage<uint8_t> kernelX(1,kSize,img.channels());
+   BitmapImage<uint8_t> kernelY(kSize,1,img.channels());
+   float sum = 0;
+   int val;
+   for(int i = 0; i < kSize; ++i) {
+      val = 255.f * kFunc(i, 0, kCenter, 0, kStd, 1, 0.f);
+      sum += val;
+      for(int k = 0; k < chans; ++k)
+         kernelX[0][i*chans+k] = kernelY[i][k] = val;
+   }
+   sum /= 255.f;
+   for(int i = 0; i < kSize; ++i) {
+      for(int k = 0; k < chans; ++k) {
+         kernelX[0][i*chans+k] /= sum;
+         kernelY[i][k] /= sum;
+      }
+   }
+
+   BitmapImage<uint8_t> tmp(img.rows(), img.cols(), img.channels());
    filter(tmp, img, kernelX);
    filter(out, tmp, kernelY);
 }
