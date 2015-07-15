@@ -33,7 +33,7 @@ ADD_TEST(
    COMMAND pgvl_tests --gtest_filter=ImageProcessingTest*
 )
 
-ADD_TEST(
-   NAME CachePerformanceTest
-   COMMAND valgrind --tool=callgrind --simulate-cache=yes --dump-instr=yes --collect-jumps=yes pgvl_cache_test
-)
+#ADD_TEST(
+#   NAME CachePerformanceTest
+#   COMMAND valgrind --tool=callgrind --simulate-cache=yes --dump-instr=yes --collect-jumps=yes ${EXECUTABLE_OUTPUT_PATH}/pgvl_cache_test
+#)
