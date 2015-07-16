@@ -9,6 +9,7 @@
 #include <cmath>
 #include <BitmapImage.h>
 #include <Point.h>
+#include <Eigen/Dense>
 
 /*!
  * \defgroup ImageProcessing Image Processing
@@ -294,6 +295,128 @@ void lowpassFilter(
    BitmapImage<uint8_t> tmp(img.rows(), img.cols(), img.channels());
    filter(tmp, img, kernelX);
    filter(out, tmp, kernelY);
+}
+
+/*!
+ * \ingroup ImageProcessing
+ * \brief Get spatial gradients
+ */
+template<class T>
+void gradient(
+   BitmapImage<float>& outDx,
+   BitmapImage<float>& outDy,
+   BitmapImage<T> const& img
+) {
+
+   int const chans = img.channels();
+   BitmapImage<float> dx(1,3,img.channels());
+   BitmapImage<float> dy(3,1,img.channels());
+
+   dx[0][0*chans + 0] = -0.5f;
+   dx[0][2*chans + 0] = 0.5f;
+
+   dy[0][0] = -0.5f;
+   dy[2][0] = 0.5f;
+
+   for(int i = 1; i < chans; ++i) {
+      dx[0][0*chans + i] = dx[0][0*chans + 0];
+      dx[0][2*chans + i] = dx[0][2*chans + 0];
+      dy[0][chans] = dy[0][0];
+      dy[2][chans] = dy[2][0];
+   }
+
+   filter(outDx, img, dx);
+   filter(outDy, img, dy);
+}
+
+void opticalFlowToRgb(
+   BitmapImage<uint8_t>& rgb,
+   BitmapImage<float>& flow
+){
+   float const maxFlow = 10.f;
+   int i,j;
+   for( i = 0; i < rgb.rows(); ++i ) {
+      for( j = 0; j < rgb.cols(); ++j ) {
+         int r = 128 + 128.f*flow[i][j*2+0]/maxFlow;
+         int g = 128 + 128.f*flow[i][j*2+1]/maxFlow;
+
+         r = std::max(r, 0);
+         r = std::min(r, 255);
+         g = std::max(g, 0);
+         g = std::min(g, 255);
+         rgb[i][j*3+0] = r;
+         rgb[i][j*3+1] = g;
+         rgb[i][j*3+2] = 128;
+      }
+   }
+}
+
+void hsOpticalFlow(
+   BitmapImage<float>& flow,
+   BitmapImage<float>& img0,
+   BitmapImage<float>& img1
+) {
+   int const rows = img0.rows();
+   int const cols = img0.cols();
+   int const chans = img0.channels();
+   int i,j,k;
+   int m,n;
+   BitmapImage<float> x0(rows, cols, chans);
+   BitmapImage<float> x1(rows, cols, chans);
+   BitmapImage<float> dx(rows, cols, chans);
+   BitmapImage<float> dy(rows, cols, chans);
+   BitmapImage<float> dt(rows, cols, chans);
+
+   // LPF for noise
+   lowpassFilter(x0, img0, 2);
+   lowpassFilter(x1, img1, 2);
+
+   // Get dx,dy,dt
+   gradient(dx, dy, x0);
+   for(i = 0; i < rows; ++i)
+      for(j = 0; j < cols; ++j)
+         for(k = 0; k < chans; ++k)
+            dt[i][j*chans+k] = x1[i][j*chans+k] - x0[i][j*chans+k];
+
+   // | Ix[0]  Iy[0] | [dx;dy] = | It[0] |
+   // | Ix[1]  Iy[1] |           | It[1] |
+   //   ...
+   // | Ix[n]  Iy[n] |           | It[n] |
+   //
+   // A x = b
+   // x = (A^TA)^-1 A^Tb
+   // A^TA = [ \sum_{i=1}^n Ix[i]^2 & \sum{i=1}^n Ix[i]Iy[i] \\ \sum{i=1}^n Ix[i]Iy[i] & \sum{i=1}^n Iy[i]^2 ]
+   // A^Tb = [ \sum_{i=1}^n Ix[i]It[i] \\ \sum_{i=1}^n Iy[i]It[i] ]
+
+   Eigen::Matrix2f A;
+   Eigen::Vector2f b;
+   Eigen::Vector2f x;
+   int const radius = 1;
+   for(i = radius; i < rows - radius; ++i) {
+      for(j = radius; j < cols - radius; ++j) {
+         A.setZero();
+         b.setZero();
+
+         // NOTE: optimize this aggregation later with integral images
+         for(m = i-radius; m < i+radius; ++m) {
+            for(n = j-radius; n < j+radius; ++n) {
+               for(k = 0; k < chans; ++k) {
+                  A(0,0) += dx[m][n*chans+k]*dx[m][n*chans+k];
+                  A(0,1) += dx[m][n*chans+k]*dy[m][n*chans+k];
+                  A(1,1) += dy[m][n*chans+k]*dy[m][n*chans+k];
+
+                  b(0) += dx[m][n*chans+k]*dt[m][n*chans+k];
+                  b(1) += dy[m][n*chans+k]*dt[m][n*chans+k];
+               }
+            }
+         }
+         A(1,0) = A(0,1);
+
+         x = A.ldlt().solve(b);
+         flow[i][j*2+0] = x(0);
+         flow[i][j*2+1] = x(1);
+      }
+   }
 }
 
 #endif /*IMAGEPROCESSING_H*/

@@ -349,3 +349,43 @@ int pgmwrite_float(
    delete[] cdata;
    return ret;
 }
+
+int ppmwrite(
+   const char* filename,
+   int w, int h, int pitch,
+   unsigned char const* data,
+   const char* comment_string
+)
+{
+    FILE* file;
+    int maxval;
+    int nread;
+    int rowpix = 3*w;
+
+    if ((file = fopen(filename, "w")) == NULL)
+    {
+       printf("ERROR: file open failed\n");
+       return(-1);
+    }
+
+    fprintf(file,"P6\n");
+    if (comment_string != NULL)
+      fprintf(file,"# %s \n", comment_string);
+    fprintf(file,"%d %d \n", w, h);
+
+    maxval = 255;
+    fprintf(file, "%d \n", maxval);
+
+    while(h--){
+      nread = fwrite(data, sizeof(unsigned char), rowpix, file);
+      if( nread != rowpix )
+      {
+        fprintf(stderr, "Error: wrote %d/%d pixels.", nread, rowpix);
+        exit(1);
+      }
+      data += pitch;
+    }
+
+    fclose(file);
+    return 0;
+}

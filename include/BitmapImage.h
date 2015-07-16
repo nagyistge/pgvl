@@ -161,20 +161,18 @@ public:
       BitmapImage<U> const& rhs,
       std::function<T(U)> elementConversion = [](U u) -> T {return static_cast<T>(u);} ) {
       // Don't self-assign
-      if( this == &rhs )
-         return *this;
+      if( reinterpret_cast<void const*>(this) == reinterpret_cast<void const*>(&rhs) )
+         return;
 
       BitmapImage<T>& me = *this;
 
-      resize(rhs._rows, rhs._cols, rhs._channels);
+      resize(rhs.rows(), rhs.cols(), rhs.channels());
 #pragma omp parallel for shared(me, rhs, elementConversion)
       for( int i = 0; i < _rows; ++i ) {
          for( int j = 0; j < _cols*_channels; ++j ) {
             me[i][j] = elementConversion(rhs[i][j]);
          }
       }
-
-      return *this;
    }
 
    //! \brief Number of rows in the image
@@ -243,9 +241,8 @@ public:
          break;
       case 3:
          // TODO: implement ppmwrite()
-         //filename += ".ppm";
-         //ppmwrite(filename.c_str(), _cols, _rows, rawData, "", 1);
-         LOGE("PPM writing not yet supported");
+         filename += ".ppm";
+         ppmwrite(filename.c_str(), _cols, _rows, rowWidth(), _data, "");
          break;
       default:
          LOGE("Bad image format");

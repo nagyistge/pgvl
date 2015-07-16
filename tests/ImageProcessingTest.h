@@ -119,4 +119,20 @@ TEST_F(ImageProcessingTest, lowpassFilter) {
    lpf.save("/tmp/lena_lpf");
 }
 
+TEST_F(ImageProcessingTest, hsOpticalFlow) {
+   BitmapImage<uint8_t> frame1(TEST_IMAGE_DIR "office.0.ppm");
+   BitmapImage<uint8_t> frame2(TEST_IMAGE_DIR "office.1.ppm");
+   BitmapImage<float> fframe1;
+   BitmapImage<float> fframe2;
+   BitmapImage<float> flow(frame1.rows(), frame2.cols(), 2);
+   BitmapImage<uint8_t> flowRgb(flow.rows(), flow.cols(), 3);
+
+   fframe1.convertFrom(frame1);
+   fframe2.convertFrom(frame2);
+   hsOpticalFlow(flow, fframe1, fframe2);
+   opticalFlowToRgb(flowRgb, flow);
+
+   flowRgb.save("/tmp/flow");
+}
+
 #endif /*IMAGEPROCESSINGTEST_H*/

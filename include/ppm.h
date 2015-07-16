@@ -85,4 +85,11 @@ int pgmwrite_float(
    int binsave
 );
 
+int ppmwrite(
+   const char* filename,
+   int w, int h, int pitch,
+   unsigned char const* data,
+   const char* comment_string
+);
+
 #endif /*PGVLPPM_H*/
