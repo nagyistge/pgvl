@@ -258,7 +258,7 @@ float* ppmread_float(const char* filename, int* w, int* h )
 
 int pgmwrite(
    const char* filename,
-   int w, int h,
+   int w, int h, int pitch,
    unsigned char* data, 
    const char* comment_string,
    int binsave
@@ -268,7 +268,6 @@ int pgmwrite(
     int maxval;
     int nread;
     int i,j,k;
-    int numpix = w*h;
     
     if ((file = fopen(filename, "w")) == NULL)
     {
@@ -286,41 +285,34 @@ int pgmwrite(
 
     fprintf(file,"%d %d \n", w, h);
     
-    // I think this is wrong.
-    /*
-    maxval = 0;
-    k = 0;
-    for (i = 0; i < h; i++)
-    {
-       for (j=0; j < w; j++)
-       {
-         if ((int)data[k] > maxval)
-            maxval = (int)data[k];
-         ++k;
-       }
-    }
-   */
-    
     maxval = 255;
     fprintf(file, "%d \n", maxval);
     
     if (binsave == 1)
     {
-      nread = fwrite(data, sizeof(unsigned char), numpix, file);
-      if( nread != numpix )
+      while(h--)
       {
-         fprintf(stderr, "Error: wrote %d/%d pixels.", nread, numpix);
-         exit(1);
+        nread = fwrite(data, sizeof(unsigned char), w, file);
+        if( nread != w )
+        {
+          fprintf(stderr, "Error: wrote %d/%d pixels.", nread, w);
+          exit(1);
+        }
+
+        data += pitch;
       }
     }
     else
     {
       printf("Writing to %s as ascii.\n", filename);
 
-      k = 0;
       for(i=0; i<h; i++)
+      {
+        k = 0;
         for(j=0; j<w; j++)
           fprintf(file,"%d ", (int)data[k++]);
+        data += pitch;
+      }
     }     
    
     fclose(file);
@@ -344,7 +336,7 @@ int pgmwrite_float(
    
    for( i = 0; i < numpix; ++i )
       cdata[i] = data[i] < 0.f ? 0 : (data[i]>1.f?255:(static_cast<unsigned char>(255.f*data[i])));
-   ret = pgmwrite(filename, w, h, cdata, comment_string, binsave);
+   ret = pgmwrite(filename, w, h, w, cdata, comment_string, binsave);
    
    delete[] cdata;
    return ret;

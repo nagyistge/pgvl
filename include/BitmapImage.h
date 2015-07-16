@@ -226,18 +226,12 @@ public:
          return;
       }
 
-      uint8_t* rawData = new uint8_t[_rows*_cols*_channels];
-
-      for( int i = 0; i < _rows; ++i ) {
-         memcpy(rawData + i*_channels*_cols, _data + i*_rowWidth, _channels*_cols);
-      }
-
       std::string filename(basename);
 
       switch( _channels ) {
       case 1:
          filename += ".pgm";
-         pgmwrite(filename.c_str(), _cols, _rows, rawData, "", 1);
+         pgmwrite(filename.c_str(), _cols, _rows, rowWidth(), _data, "", 1);
          break;
       case 3:
          // TODO: implement ppmwrite()
@@ -248,8 +242,6 @@ public:
          LOGE("Bad image format");
          break;
       }
-
-      delete[] rawData;
    }
 
    //! \brief Pointer to the ith row of pixel data

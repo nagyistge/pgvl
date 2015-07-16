@@ -51,13 +51,14 @@ float* ppmread_float(const char* filename, int* w, int* h );
  * \param filename The file to write to.
  * \param w Image width
  * \param h Image height
+ * \param pitch number of bytes in one row of data
  * \param data Row-major image data
  * \param comment_string Comments (NULL if none)
  * \param binsave 1 for binary writing, 0 for text writing
  */
 int pgmwrite(
    const char* filename,
-   int w, int h,
+   int w, int h, int pitch,
    unsigned char* data, 
    const char* comment_string,
    int binsave
@@ -85,6 +86,18 @@ int pgmwrite_float(
    int binsave
 );
 
+/*!
+ * \brief Write a PPM image.
+ *
+ * Writes binary format "P6".
+ *
+ * \param filename The file to write to.
+ * \param w image width
+ * \param h image height
+ * \param pitch number of bytes in one row of data
+ * \param data row-major image data
+ * \param comment_string comments (NULL if none)
+ */
 int ppmwrite(
    const char* filename,
    int w, int h, int pitch,
