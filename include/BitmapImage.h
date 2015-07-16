@@ -95,11 +95,11 @@ public:
 
       switch( fileType(filename) ) {
       case FILETYPE_PGM:
-         rawData = pgmread(filename.c_str(), &_rows, &_cols);
+         rawData = pgmread(filename.c_str(), &_cols, &_rows);
          _channels = 1;
          break;
       case FILETYPE_PPM:
-         rawData = ppmread(filename.c_str(), &_rows, &_cols, &maxval);
+         rawData = ppmread(filename.c_str(), &_cols, &_rows, &maxval);
          _channels = 3;
          break;
       default:
@@ -301,5 +301,8 @@ private:
          return FILETYPE_NONE;
    }
 };
+
+void rgb2hsl(BitmapImage<float>& img);
+void hsl2rgb(BitmapImage<float>& img);
 
 #endif /*BITMAPIMAGE_H*/

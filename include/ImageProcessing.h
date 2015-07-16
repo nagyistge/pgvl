@@ -333,10 +333,15 @@ void opticalFlowToRgb(
    BitmapImage<uint8_t>& rgb,
    BitmapImage<float>& flow
 ){
-   float const maxFlow = 10.f;
+   float const maxFlow = 1.f;
+   int const rows = rgb.rows();
+   int const cols = rgb.cols();
+
+   BitmapImage<float> hsl(rows, cols, 3);
    int i,j;
-   for( i = 0; i < rgb.rows(); ++i ) {
-      for( j = 0; j < rgb.cols(); ++j ) {
+   for( i = 0; i < rows; ++i ) {
+      for( j = 0; j < cols; ++j ) {
+         /*
          int r = 128 + 128.f*flow[i][j*2+0]/maxFlow;
          int g = 128 + 128.f*flow[i][j*2+1]/maxFlow;
 
@@ -347,8 +352,21 @@ void opticalFlowToRgb(
          rgb[i][j*3+0] = r;
          rgb[i][j*3+1] = g;
          rgb[i][j*3+2] = 128;
+         */
+
+         float dx = flow[i][j*2+0];
+         float dy = flow[i][j*2+1];
+         float angle = 180.f + 180.f/M_PI * atan2(dy, dx);
+         float mag = sqrtf(dx*dx + dy*dy) / maxFlow;
+
+         hsl[i][j*3+0] = angle;
+         hsl[i][j*3+1] = std::min(1.f, mag);
+         hsl[i][j*3+2] = 0.5f;
       }
    }
+
+   hsl2rgb(hsl);
+   rgb.convertFrom<float>(hsl, [](float x) -> uint8_t { return static_cast<uint8_t>(255.f*x); });
 }
 
 void hsOpticalFlow(
