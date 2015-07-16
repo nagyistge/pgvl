@@ -356,9 +356,13 @@ void hsOpticalFlow(
    BitmapImage<float>& img0,
    BitmapImage<float>& img1
 ) {
+   // Patch radius in pixels
+   int const radius = 1;
    int const rows = img0.rows();
    int const cols = img0.cols();
    int const chans = img0.channels();
+   // Regularization parameter (bias flow towards 0)
+   float const gamma = 1e-2 * (2*radius+1)*(2*radius+1)*chans;
    int i,j,k;
    int m,n;
    BitmapImage<float> x0(rows, cols, chans);
@@ -391,7 +395,6 @@ void hsOpticalFlow(
    Eigen::Matrix2f A;
    Eigen::Vector2f b;
    Eigen::Vector2f x;
-   int const radius = 1;
    for(i = radius; i < rows - radius; ++i) {
       for(j = radius; j < cols - radius; ++j) {
          A.setZero();
@@ -410,7 +413,11 @@ void hsOpticalFlow(
                }
             }
          }
+         // Make it symmetric
          A(1,0) = A(0,1);
+         // Apply regularization
+         A(0,0) += gamma;
+         A(1,1) += gamma;
 
          x = A.ldlt().solve(b);
          flow[i][j*2+0] = x(0);
