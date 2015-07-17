@@ -333,40 +333,30 @@ void opticalFlowToRgb(
    BitmapImage<uint8_t>& rgb,
    BitmapImage<float>& flow
 ){
-   float const maxFlow = 1.f;
+   float const maxFlow = 2.f;
    int const rows = rgb.rows();
    int const cols = rgb.cols();
 
-   BitmapImage<float> hsl(rows, cols, 3);
+   BitmapImage<float> hsv(rows, cols, 3);
    int i,j;
    for( i = 0; i < rows; ++i ) {
       for( j = 0; j < cols; ++j ) {
-         /*
-         int r = 128 + 128.f*flow[i][j*2+0]/maxFlow;
-         int g = 128 + 128.f*flow[i][j*2+1]/maxFlow;
-
-         r = std::max(r, 0);
-         r = std::min(r, 255);
-         g = std::max(g, 0);
-         g = std::min(g, 255);
-         rgb[i][j*3+0] = r;
-         rgb[i][j*3+1] = g;
-         rgb[i][j*3+2] = 128;
-         */
-
          float dx = flow[i][j*2+0];
          float dy = flow[i][j*2+1];
-         float angle = 180.f + 180.f/M_PI * atan2(dy, dx);
+         float angle = 180.f/M_PI * atan2(dy, dx);
          float mag = sqrtf(dx*dx + dy*dy) / maxFlow;
 
-         hsl[i][j*3+0] = angle;
-         hsl[i][j*3+1] = std::min(1.f, mag);
-         hsl[i][j*3+2] = 0.5f;
+         if( angle < 0.f )
+            angle += 360.f;
+
+         hsv[i][j*3+0] = angle;
+         hsv[i][j*3+1] = std::min(1.f, mag);
+         hsv[i][j*3+2] = 1.f;
       }
    }
 
-   hsl2rgb(hsl);
-   rgb.convertFrom<float>(hsl, [](float x) -> uint8_t { return static_cast<uint8_t>(255.f*x); });
+   hsv2rgb(hsv);
+   rgb.convertFrom<float>(hsv, [](float x) -> uint8_t { return static_cast<uint8_t>(255.f*x); });
 }
 
 void hsOpticalFlow(
@@ -375,7 +365,7 @@ void hsOpticalFlow(
    BitmapImage<float>& img1
 ) {
    // Patch radius in pixels
-   int const radius = 1;
+   int const radius = 3;
    int const rows = img0.rows();
    int const cols = img0.cols();
    int const chans = img0.channels();
@@ -398,7 +388,7 @@ void hsOpticalFlow(
    for(i = 0; i < rows; ++i)
       for(j = 0; j < cols; ++j)
          for(k = 0; k < chans; ++k)
-            dt[i][j*chans+k] = x1[i][j*chans+k] - x0[i][j*chans+k];
+            dt[i][j*chans+k] = x0[i][j*chans+k] - x1[i][j*chans+k];
 
    // | Ix[0]  Iy[0] | [dx;dy] = | It[0] |
    // | Ix[1]  Iy[1] |           | It[1] |
