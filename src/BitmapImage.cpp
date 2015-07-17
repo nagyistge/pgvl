@@ -95,3 +95,89 @@ void hsl2rgb(BitmapImage<float>& img) {
       }
    }
 }
+
+void rgb2hsv(BitmapImage<float>& img) {
+   float r,g,b;
+   float h,s,v;
+
+   int const rows = img.rows();
+   int const cols = img.cols();
+   int const chans = img.channels();
+
+   for(int i = 0; i < rows; ++i) {
+      for(int j = 0; j < cols; ++j) {
+         r = img[i][j*chans+0];
+         g = img[i][j*chans+1];
+         b = img[i][j*chans+2];
+
+         v = std::max(r,std::max(g,b));
+         if( v < 1e-5 )
+            s = 0;
+         else
+            s = (v - std::min(r,std::min(g,b))) / v;
+
+         if( v == r ) {
+            h = 60.f*(g-b)/(v - std::min(r,std::min(g,b)));
+         } else if( v == g ) {
+            h = 120.f+60.f*(b-r)/(v - std::min(r,std::min(g,b)));
+         } else {
+            h = 240.f+60.f*(r-g)/(v - std::min(r,std::min(g,b)));
+         }
+
+         if( h < 0.f )
+            h += 360.f;
+
+         img[i][j*chans+0] = h;
+         img[i][j*chans+1] = s;
+         img[i][j*chans+2] = v;
+      }
+   }
+}
+
+void hsv2rgb(BitmapImage<float>& img) {
+   float r,g,b;
+   float h,s,v;
+   float c, x, m;
+
+   int const rows = img.rows();
+   int const cols = img.cols();
+   int const chans = img.channels();
+
+   for(int i = 0; i < rows; ++i) {
+      for(int j = 0; j < cols; ++j) {
+         h = img[i][j*chans+0];
+         s = img[i][j*chans+1];
+         v = img[i][j*chans+2];
+
+         c = v*s;
+         x = (1.f - std::abs(fmod(h/60.f,2.f) - 1.f))*c;
+         m = v-c;
+
+         r = g = b = m;
+
+         if( h < 60.f ) {
+            r += c;
+            g += x;
+         } else if( h < 120.f ) {
+            r += x;
+            g += c;
+         } else if( h < 180.f ) {
+            g += c;
+            b += x;
+         } else if( h < 240.f ) {
+            g += x;
+            b += c;
+         } else if( h < 300.f ) {
+            r += x;
+            b += c;
+         } else {
+            r += c;
+            b += x;
+         }
+
+         img[i][j*chans+0] = r;
+         img[i][j*chans+1] = g;
+         img[i][j*chans+2] = b;
+      }
+   }
+}

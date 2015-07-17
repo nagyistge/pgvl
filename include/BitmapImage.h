@@ -304,5 +304,7 @@ private:
 
 void rgb2hsl(BitmapImage<float>& img);
 void hsl2rgb(BitmapImage<float>& img);
+void rgb2hsv(BitmapImage<float>& img);
+void hsv2rgb(BitmapImage<float>& img);
 
 #endif /*BITMAPIMAGE_H*/
