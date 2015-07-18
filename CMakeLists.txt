@@ -31,6 +31,11 @@ OPTION(
    OFF
 )
 
+OPTION(
+   PERFORMANCE_TESTS
+   "Enable time-consuming performance test cases"
+   OFF
+)
 #===========Set release/debug settings==========
 
 SET( CMAKE_CXX_FLAGS_DEBUG "-g3 -Wall -Wno-sign-compare" )
