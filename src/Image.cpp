@@ -5,6 +5,7 @@
 
 #include <Image.h>
 #include <cmath>
+#include <Eigen/Dense>
 
 void srgb2rgb(Image<float>& img) {
    int const rows = img.rows();
@@ -44,6 +45,59 @@ void rgb2srgb(Image<float>& img) {
          for(int k = 0; k < chans; ++k) {
             convert(img[i][j*chans+k]);
          }
+      }
+   }
+}
+
+void rgb2xyz(Image<float>& img) {
+   int const rows = img.rows();
+   int const cols = img.cols();
+   int const chans = img.channels();
+   Eigen::Vector3f rgb;
+   Eigen::Vector3f xyz;
+   Eigen::Matrix3f A;
+
+   A << 0.49f, 0.31f, 0.20f, 0.17697f, 0.81240f, 0.01063f, 0.00f, 0.01f, 0.99f;
+   A /= A(1,0);
+
+   for(int i = 0; i < rows; ++i) {
+      for(int j = 0; j < cols; ++j) {
+         rgb(0) = img[i][j*chans+0];
+         rgb(1) = img[i][j*chans+1];
+         rgb(2) = img[i][j*chans+2];
+
+         xyz = A*rgb;
+         img[i][j*chans+0] = xyz(0);
+         img[i][j*chans+1] = xyz(1);
+         img[i][j*chans+2] = xyz(2);
+      }
+   }
+}
+
+void xyz2rgb(Image<float>& img) {
+   int const rows = img.rows();
+   int const cols = img.cols();
+   int const chans = img.channels();
+   Eigen::Vector3f rgb;
+   Eigen::Vector3f xyz;
+   Eigen::Matrix3f A;
+
+   // This is the rgb->xyz matrix. Need its inverse.
+   A << 0.49f, 0.31f, 0.20f, 0.17697f, 0.81240f, 0.01063f, 0.00f, 0.01f, 0.99f;
+   A /= A(1,0);
+
+   A = A.inverse();
+
+   for(int i = 0; i < rows; ++i) {
+      for(int j = 0; j < cols; ++j) {
+         xyz(0) = img[i][j*chans+0];
+         xyz(1) = img[i][j*chans+1];
+         xyz(2) = img[i][j*chans+2];
+
+         rgb = A*xyz;
+         img[i][j*chans+0] = rgb(0);
+         img[i][j*chans+1] = rgb(1);
+         img[i][j*chans+2] = rgb(2);
       }
    }
 }

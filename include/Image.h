@@ -328,6 +328,24 @@ void rgb2srgb(Image<float>& img);
 void srgb2rgb(Image<float>& img);
 /*!
  * \ingroup Colorspaces
+ * \brief Convert from linear RGB to XYZ
+ *
+ * [XYZ colorspace](https://en.wikipedia.org/wiki/CIE_1931_color_space)
+ *
+ * \param[in,out] img the image to convert
+ */
+void rgb2xyz(Image<float>& img);
+/*!
+ * \ingroup Colorspaces
+ * \brief Convert from XYZ to linear RGB
+ *
+ * [XYZ colorspace](https://en.wikipedia.org/wiki/CIE_1931_color_space)
+ *
+ * \param[in,out] img the image to convert
+ */
+void xyz2rgb(Image<float>& img);
+/*!
+ * \ingroup Colorspaces
  * \brief Convert from linear RGB to HSL
  *
  * [HSL colorspace](https://en.wikipedia.org/wiki/HSL_and_HSV)
