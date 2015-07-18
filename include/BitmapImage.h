@@ -302,11 +302,66 @@ private:
    }
 };
 
+/*!
+ * \defgroup Colorspaces Colorspaces
+ * \brief Functions dealing with colorspaces
+ */
+
+/*!
+ * \ingroup Colorspaces
+ * \brief Convert from linear RGB to sRGB
+ *
+ * The [sRGB colorspace](https://en.wikipedia.org/wiki/SRGB) is meant for
+ * display on a screen, and is usually what color images are stored as.
+ *
+ * \param[in,out] img the image to convert
+ */
 void rgb2srgb(BitmapImage<float>& img);
+/*!
+ * \ingroup Colorspaces
+ * \brief Convert from sRGB to linear RGB
+ *
+ * The [sRGB colorspace](https://en.wikipedia.org/wiki/SRGB) is meant for
+ * display on a screen, and is usually what color images are stored as.
+ *
+ * \param[in,out] img the image to convert
+ */
 void srgb2rgb(BitmapImage<float>& img);
+/*!
+ * \ingroup Colorspaces
+ * \brief Convert from linear RGB to HSL
+ *
+ * [HSL colorspace](https://en.wikipedia.org/wiki/HSL_and_HSV)
+ *
+ * \param[in,out] img the image to convert
+ */
 void rgb2hsl(BitmapImage<float>& img);
+/*!
+ * \ingroup Colorspaces
+ * \brief Convert from HSL to linear RGB
+ *
+ * [HSL colorspace](https://en.wikipedia.org/wiki/HSL_and_HSV)
+ *
+ * \param[in,out] img the image to convert
+ */
 void hsl2rgb(BitmapImage<float>& img);
+/*!
+ * \ingroup Colorspaces
+ * \brief Convert from linear RGB to HSV
+ *
+ * [HSV colorspace](https://en.wikipedia.org/wiki/HSL_and_HSV)
+ *
+ * \param[in,out] img the image to convert
+ */
 void rgb2hsv(BitmapImage<float>& img);
+/*!
+ * \ingroup Colorspaces
+ * \brief Convert from HSV to linear RGB
+ *
+ * [HSV colorspace](https://en.wikipedia.org/wiki/HSL_and_HSV)
+ *
+ * \param[in,out] img the image to convert
+ */
 void hsv2rgb(BitmapImage<float>& img);
 
 #endif /*BITMAPIMAGE_H*/
