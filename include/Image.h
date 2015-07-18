@@ -12,6 +12,7 @@
 #include <inttypes.h>
 #include <stdlib.h>
 #include <ppm.h>
+#include <SDL.h>
 #include "config.h"
 
 /*!
@@ -300,6 +301,11 @@ private:
          return FILETYPE_NONE;
    }
 };
+
+/*!
+ * \brief Create an SDL surface for image rendering
+ */
+SDL_Surface* toSurface(Image<uint8_t>& img);
 
 /*!
  * \defgroup Colorspaces Colorspaces

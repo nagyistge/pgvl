@@ -7,6 +7,8 @@ I aim to make it efficient, succinct, and well-documented.
 
 - cmake
 - libgtest-dev
+- libeigen3-dev
+- libsdl2-dev
 
 ## Building
 

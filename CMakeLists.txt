@@ -10,7 +10,7 @@ SET( EXECUTABLE_OUTPUT_PATH "${PROJECT_BINARY_DIR}/bin" )
 SET( LIBRARY_OUTPUT_PATH "${PROJECT_BINARY_DIR}/lib" )
 
 #==============Custom Cmake Modules=============
-#SET( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMakeModules" )
+SET( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules" )
 
 #================Find Packages==================
 FIND_PACKAGE( GTest REQUIRED )
@@ -19,6 +19,9 @@ ENABLE_TESTING()
 
 FIND_PACKAGE( Eigen3 REQUIRED )
 INCLUDE_DIRECTORIES( ${EIGEN3_INCLUDE_DIR} )
+
+FIND_PACKAGE(SDL2 REQUIRED)
+INCLUDE_DIRECTORIES(${SDL2_INCLUDE_DIR})
 
 #=================Options=======================
 

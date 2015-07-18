@@ -6,6 +6,21 @@
 #include <Image.h>
 #include <cmath>
 #include <Eigen/Dense>
+#include <SDL.h>
+
+SDL_Surface* toSurface(Image<uint8_t>& img) {
+   return SDL_CreateRGBSurfaceFrom(
+      img[0],
+      img.cols(),
+      img.rows(),
+      8*img.channels(),
+      img.rowWidth(),
+      0,
+      0,
+      0,
+      0
+   );
+}
 
 void srgb2rgb(Image<float>& img) {
    int const rows = img.rows();
