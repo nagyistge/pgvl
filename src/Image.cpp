@@ -15,9 +15,9 @@ SDL_Surface* toSurface(Image<uint8_t>& img) {
       img.rows(),
       8*img.channels(),
       img.rowWidth(),
-      0,
-      0,
-      0,
+      0x0000FF,
+      0x00FF00,
+      0xFF0000,
       0
    );
 }

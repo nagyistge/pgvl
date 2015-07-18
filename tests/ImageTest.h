@@ -127,4 +127,36 @@ TEST_F(ImageTest, patch) {
    EXPECT_EQ( different, false );
 }
 
+TEST_F(ImageTest, sdlDisplay) {
+   Image<uint8_t> lenaColor(TEST_IMAGE_DIR "lena.ppm");
+
+   // Initialize SDL for video junk
+   SDL_Init( SDL_INIT_VIDEO );
+
+   // Create the window in which to display lena
+   SDL_Window* window = SDL_CreateWindow(
+      "Image Test",
+      SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+      lenaColor.cols(), lenaColor.rows(),
+      SDL_WINDOW_SHOWN
+   );
+   // Get the internal window surface
+   SDL_Surface* windowSurface = SDL_GetWindowSurface( window );
+   // Convert Image to SDL_Surface
+   SDL_Surface* imageSurface = toSurface(lenaColor);
+
+   // Copy the lena surface to the window's surface
+   SDL_BlitSurface(imageSurface, 0, windowSurface, 0);
+   // Tell the window to update its buffers
+   SDL_UpdateWindowSurface( window );
+
+   // Display for 5 seconds
+   SDL_Delay(5000);
+
+   // Cleanup
+   SDL_FreeSurface(imageSurface);
+   SDL_DestroyWindow(window);
+   SDL_Quit();
+}
+
 #endif /*BITMAPIMAGETEST_H*/
