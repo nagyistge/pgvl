@@ -119,9 +119,28 @@ TEST_F(ImageProcessingTest, lowpassFilter) {
    lpf.save("/tmp/lena_lpf");
 }
 
+// Tests the flow to rgb conversion, and also provides a flow key
+TEST_F(ImageProcessingTest, opticalFlowToRgb) {
+   int const radius = 32;
+   int const rows = 2*radius+1;
+   int const cols = rows;
+   BitmapImage<float> flow(rows, cols, 2);
+   BitmapImage<uint8_t> flowRgb(rows, cols, 3);
+
+   for(int i = 0; i < rows; ++i) {
+      for(int j = 0; j < cols; ++j) {
+         flow[i][j*2+0] = static_cast<float>(j-radius)/radius;
+         flow[i][j*2+1] = static_cast<float>(i-radius)/radius;
+      }
+   }
+
+   opticalFlowToRgb(flowRgb, flow, 1.f);
+   flowRgb.save("/tmp/flowkey");
+}
+
 TEST_F(ImageProcessingTest, hsOpticalFlow) {
-   BitmapImage<uint8_t> frame1(TEST_IMAGE_DIR "office.0.ppm");
-   BitmapImage<uint8_t> frame2(TEST_IMAGE_DIR "office.1.ppm");
+   BitmapImage<uint8_t> frame1(TEST_IMAGE_DIR "rubic.0.pgm");
+   BitmapImage<uint8_t> frame2(TEST_IMAGE_DIR "rubic.1.pgm");
    BitmapImage<float> fframe1;
    BitmapImage<float> fframe2;
    BitmapImage<float> flow(frame1.rows(), frame2.cols(), 2);

@@ -329,11 +329,19 @@ void gradient(
    filter(outDy, img, dy);
 }
 
+/*!
+ * \ingroup ImageProcessing
+ * \brief Convert dense optical flow to an rgb image for display
+ *
+ * \param[out] rgb output rgb image
+ * \param[in] flow flow image whose 2 channels are [vx, vy]
+ * \param[in] maxFlow denominator used to scale flow values for display
+ */
 void opticalFlowToRgb(
    BitmapImage<uint8_t>& rgb,
-   BitmapImage<float>& flow
+   BitmapImage<float>& flow,
+   float const maxFlow = 2.f
 ){
-   float const maxFlow = 2.f;
    int const rows = rgb.rows();
    int const cols = rgb.cols();
 
@@ -359,10 +367,18 @@ void opticalFlowToRgb(
    rgb.convertFrom<float>(hsv, [](float x) -> uint8_t { return static_cast<uint8_t>(255.f*x); });
 }
 
+/*!
+ * \ingroup ImageProcessing
+ * \brief Horn-Schunck optical flow
+ *
+ * \param[out] flow output optical flow image, whose 2 channels are [vx, vy]
+ * \param[in] img0 reference image frame
+ * \param[in] img1 image frame coming temporally after \c img0
+ */
 void hsOpticalFlow(
    BitmapImage<float>& flow,
-   BitmapImage<float>& img0,
-   BitmapImage<float>& img1
+   BitmapImage<float> const& img0,
+   BitmapImage<float> const& img1
 ) {
    // Patch radius in pixels
    int const radius = 3;
