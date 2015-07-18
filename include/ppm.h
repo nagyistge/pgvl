@@ -54,14 +54,14 @@ float* ppmread_float(const char* filename, int* w, int* h );
  * \param pitch number of bytes in one row of data
  * \param data Row-major image data
  * \param comment_string Comments (NULL if none)
- * \param binsave 1 for binary writing, 0 for text writing
+ * \param binsave true for binary writing, false for text writing
  */
 int pgmwrite(
    const char* filename,
    int w, int h, int pitch,
    unsigned char* data, 
-   const char* comment_string,
-   int binsave
+   const char* comment_string = 0,
+   bool binsave = true
 );
 
 /*!
@@ -102,7 +102,7 @@ int ppmwrite(
    const char* filename,
    int w, int h, int pitch,
    unsigned char const* data,
-   const char* comment_string
+   const char* comment_string = 0
 );
 
 #endif /*PGVLPPM_H*/

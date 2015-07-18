@@ -231,12 +231,11 @@ public:
       switch( _channels ) {
       case 1:
          filename += ".pgm";
-         pgmwrite(filename.c_str(), _cols, _rows, rowWidth(), _data, "", 1);
+         pgmwrite(filename.c_str(), _cols, _rows, rowWidth(), _data);
          break;
       case 3:
-         // TODO: implement ppmwrite()
          filename += ".ppm";
-         ppmwrite(filename.c_str(), _cols, _rows, rowWidth(), _data, "");
+         ppmwrite(filename.c_str(), _cols, _rows, rowWidth(), _data);
          break;
       default:
          LOGE("Bad image format");

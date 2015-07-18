@@ -261,7 +261,7 @@ int pgmwrite(
    int w, int h, int pitch,
    unsigned char* data, 
    const char* comment_string,
-   int binsave
+   bool binsave
 )
 {
     FILE* file;
@@ -275,12 +275,12 @@ int pgmwrite(
        return(-1);
     }
 
-    if (binsave == 1)
+    if (binsave)
       fprintf(file,"P5\n");
     else
       fprintf(file,"P2\n");
 
-    if (comment_string != NULL)
+    if (comment_string)
       fprintf(file,"# %s\n", comment_string);
 
     fprintf(file,"%d %d\n", w, h);
@@ -288,7 +288,7 @@ int pgmwrite(
     maxval = 255;
     fprintf(file, "%d\n", maxval);
     
-    if (binsave == 1)
+    if (binsave)
     {
       while(h--)
       {
@@ -361,7 +361,7 @@ int ppmwrite(
     }
 
     fprintf(file,"P6\n");
-    if (comment_string != NULL)
+    if (comment_string)
       fprintf(file,"# %s\n", comment_string);
     fprintf(file,"%d %d\n", w, h);
 
