@@ -281,12 +281,12 @@ int pgmwrite(
       fprintf(file,"P2\n");
 
     if (comment_string != NULL)
-      fprintf(file,"# %s \n", comment_string);
+      fprintf(file,"# %s\n", comment_string);
 
-    fprintf(file,"%d %d \n", w, h);
+    fprintf(file,"%d %d\n", w, h);
     
     maxval = 255;
-    fprintf(file, "%d \n", maxval);
+    fprintf(file, "%d\n", maxval);
     
     if (binsave == 1)
     {
@@ -362,11 +362,11 @@ int ppmwrite(
 
     fprintf(file,"P6\n");
     if (comment_string != NULL)
-      fprintf(file,"# %s \n", comment_string);
-    fprintf(file,"%d %d \n", w, h);
+      fprintf(file,"# %s\n", comment_string);
+    fprintf(file,"%d %d\n", w, h);
 
     maxval = 255;
-    fprintf(file, "%d \n", maxval);
+    fprintf(file, "%d\n", maxval);
 
     while(h--){
       nread = fwrite(data, sizeof(unsigned char), rowpix, file);
