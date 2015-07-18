@@ -60,6 +60,7 @@ TEST_F(BitmapImageTest, loadsBitmapImage) {
 
 // Ensure saving then loading results in the same data
 TEST_F(BitmapImageTest, loadStore) {
+   int i,j,k;
    BitmapImage<uint8_t> lena(TEST_IMAGE_DIR "lena_gray.pgm");
    lena.save("/tmp/pgvl-lena");
    BitmapImage<uint8_t> lena2("/tmp/pgvl-lena.pgm");
@@ -69,8 +70,8 @@ TEST_F(BitmapImageTest, loadStore) {
    EXPECT_EQ( lena.channels(), lena2.channels() );
 
    bool different = false;
-   for( int i = 0; i < lena.rows() && !different; ++i ) {
-      for( int j = 0; j < lena.cols(); ++j ) {
+   for( i = 0; i < lena.rows() && !different; ++i ) {
+      for( j = 0; j < lena.cols(); ++j ) {
          if( lena[i][j] != lena2[i][j] ) {
             different = true;
             break;
@@ -78,10 +79,31 @@ TEST_F(BitmapImageTest, loadStore) {
       }
    }
 
-   EXPECT_EQ( different, false );
+   if( different )
+      std::cerr << "(" << i << ", " << j << ")" << std::endl;
+   EXPECT_EQ( false, different );
+
+   BitmapImage<uint8_t> lenaColor(TEST_IMAGE_DIR "lena.ppm");
+   lenaColor.save("/tmp/pgvl-lena");
+   BitmapImage<uint8_t> lena3("/tmp/pgvl-lena.ppm");
+
+   different = false;
+   for( i = 0; i < lenaColor.rows() && !different; ++i ) {
+      for( j = 0; j < lenaColor.cols(); ++j ) {
+         for( k = 0; k < lenaColor.channels(); ++k ) {
+            if( lenaColor[i][j*lenaColor.channels()+k] != lena3[i][j*lenaColor.channels()+k] ) {
+               different = true;
+               break;
+            }
+         }
+      }
+   }
+
+   if( different )
+      std::cerr << "(" << i << ", " << j << ", " << k << ")" << std::endl;
+   EXPECT_EQ( false, different );
 }
 
-// Ensure saving then loading results in the same data
 TEST_F(BitmapImageTest, patch) {
    BitmapImage<uint8_t> lena(TEST_IMAGE_DIR "lena_gray.pgm");
    BitmapImage<uint8_t> patch;
