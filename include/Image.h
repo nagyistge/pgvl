@@ -1,10 +1,10 @@
 /*
- * BitmapImage.h is part of pgvl and is
+ * Image.h is part of pgvl and is
  * Copyright 2015 Philip G. Lee <rocketman768@gmail.com>
  */
 
-#ifndef BITMAPIMAGE_H
-#define BITMAPIMAGE_H
+#ifndef IMAGE_H
+#define IMAGE_H
 
 #include <functional>
 #include <string>
@@ -21,11 +21,11 @@
  * \tparam T the type of an individual channel
  */
 template<class T>
-class BitmapImage {
+class Image {
 public:
 
    //! \brief Default constructor
-   BitmapImage(
+   Image(
       int rows = 0,
       int cols = 0,
       int channels = 0
@@ -41,12 +41,12 @@ public:
       resize(rows, cols, channels);
       memset(_data, 0x00, rowWidth()*rows);
    }
-   ~BitmapImage() {
+   ~Image() {
       delete[] _unalignedData;
    }
 
    //! \brief Copy constructor
-   BitmapImage(BitmapImage const& other) :
+   Image(Image const& other) :
       _data(0),
       _unalignedData(0),
       _channelWidth(other._channelWidth),
@@ -62,7 +62,7 @@ public:
    }
 
    //! \brief Move constructor
-   BitmapImage(BitmapImage&& other) :
+   Image(Image&& other) :
       _data( other._data ),
       _unalignedData( other._unalignedData ),
       _channelWidth(other._channelWidth),
@@ -81,7 +81,7 @@ public:
     *
     * \param filename a .ppm or a .pgm image
     */
-   BitmapImage(std::string const& filename) :
+   Image(std::string const& filename) :
       _data(0),
       _unalignedData(0),
       _channelWidth(sizeof(T)),
@@ -127,7 +127,7 @@ public:
    }
 
    //! \brief Assignment operator
-   BitmapImage<T>& operator=(BitmapImage<T> const& rhs) {
+   Image<T>& operator=(Image<T> const& rhs) {
       // Don't self-assign
       if( this == &rhs )
          return *this;
@@ -142,7 +142,7 @@ public:
 
    //! \brief Conversion assignment
    template<class U>
-   BitmapImage<T>& operator=(BitmapImage<U> const& rhs) {
+   Image<T>& operator=(Image<U> const& rhs) {
       convertFrom(rhs);
       return *this;
    }
@@ -150,7 +150,7 @@ public:
    /*!
     * \brief Conversion assignment
     *
-    * Converts a BitmapImage containing another type
+    * Converts a Image containing another type
     *
     * \tparam U the contained type of the image to convert
     * \param rhs the image to convert
@@ -158,13 +158,13 @@ public:
     */
    template<class U>
    void convertFrom(
-      BitmapImage<U> const& rhs,
+      Image<U> const& rhs,
       std::function<T(U)> elementConversion = [](U u) -> T {return static_cast<T>(u);} ) {
       // Don't self-assign
       if( reinterpret_cast<void const*>(this) == reinterpret_cast<void const*>(&rhs) )
          return;
 
-      BitmapImage<T>& me = *this;
+      Image<T>& me = *this;
 
       resize(rhs.rows(), rhs.cols(), rhs.channels());
 #pragma omp parallel for shared(me, rhs, elementConversion)
@@ -261,7 +261,7 @@ public:
     * \param[in] top the upper boundary
     * \param[in] bottom the lower boundary
     */
-   void patch(BitmapImage<T>& out, int left, int right, int top, int bottom) {
+   void patch(Image<T>& out, int left, int right, int top, int bottom) {
       if( left > right ||
          top > bottom ||
          left < 0 ||
@@ -316,7 +316,7 @@ private:
  *
  * \param[in,out] img the image to convert
  */
-void rgb2srgb(BitmapImage<float>& img);
+void rgb2srgb(Image<float>& img);
 /*!
  * \ingroup Colorspaces
  * \brief Convert from sRGB to linear RGB
@@ -326,7 +326,7 @@ void rgb2srgb(BitmapImage<float>& img);
  *
  * \param[in,out] img the image to convert
  */
-void srgb2rgb(BitmapImage<float>& img);
+void srgb2rgb(Image<float>& img);
 /*!
  * \ingroup Colorspaces
  * \brief Convert from linear RGB to HSL
@@ -335,7 +335,7 @@ void srgb2rgb(BitmapImage<float>& img);
  *
  * \param[in,out] img the image to convert
  */
-void rgb2hsl(BitmapImage<float>& img);
+void rgb2hsl(Image<float>& img);
 /*!
  * \ingroup Colorspaces
  * \brief Convert from HSL to linear RGB
@@ -344,7 +344,7 @@ void rgb2hsl(BitmapImage<float>& img);
  *
  * \param[in,out] img the image to convert
  */
-void hsl2rgb(BitmapImage<float>& img);
+void hsl2rgb(Image<float>& img);
 /*!
  * \ingroup Colorspaces
  * \brief Convert from linear RGB to HSV
@@ -353,7 +353,7 @@ void hsl2rgb(BitmapImage<float>& img);
  *
  * \param[in,out] img the image to convert
  */
-void rgb2hsv(BitmapImage<float>& img);
+void rgb2hsv(Image<float>& img);
 /*!
  * \ingroup Colorspaces
  * \brief Convert from HSV to linear RGB
@@ -362,6 +362,6 @@ void rgb2hsv(BitmapImage<float>& img);
  *
  * \param[in,out] img the image to convert
  */
-void hsv2rgb(BitmapImage<float>& img);
+void hsv2rgb(Image<float>& img);
 
-#endif /*BITMAPIMAGE_H*/
+#endif /*IMAGE_H*/

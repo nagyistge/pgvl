@@ -7,7 +7,7 @@
 #define IMAGEPROCESSING_H
 
 #include <cmath>
-#include <BitmapImage.h>
+#include <Image.h>
 #include <Point.h>
 #include <Eigen/Dense>
 
@@ -25,7 +25,7 @@
  * \param[in,out] img the input image and output integral image
  */
 template<class T>
-void integrate(BitmapImage<T>& img) {
+void integrate(Image<T>& img) {
    int i,j;
    int const channels = img.channels();
 
@@ -53,7 +53,7 @@ void integrate(BitmapImage<T>& img) {
  * \param[in,out] img the input image and output squared integral image
  */
 template<class T>
-void integrateSquare(BitmapImage<T>& img) {
+void integrateSquare(Image<T>& img) {
    int i,j;
    int const channels = img.channels();
 
@@ -96,9 +96,9 @@ void integrateSquare(BitmapImage<T>& img) {
  */
 template<class T, class U>
 void filter(
-   BitmapImage<T>& out,
-   BitmapImage<T> const& img,
-   BitmapImage<U> const& kernel,
+   Image<T>& out,
+   Image<T> const& img,
+   Image<U> const& kernel,
    Point const& anchor = Point(-1,-1),
    float delta = 0.f
 ) {
@@ -146,9 +146,9 @@ void filter(
  */
 template<>
 void filter(
-   BitmapImage<uint8_t>& out,
-   BitmapImage<uint8_t> const& img,
-   BitmapImage<uint8_t> const& kernel,
+   Image<uint8_t>& out,
+   Image<uint8_t> const& img,
+   Image<uint8_t> const& kernel,
    Point const& anchor,
    float delta
 ) {
@@ -226,8 +226,8 @@ std::function<float(T,T,T,T,T,T,float)> gauss() {
  */
 template<class T>
 void lowpassFilter(
-   BitmapImage<T>& out,
-   BitmapImage<T> const& img,
+   Image<T>& out,
+   Image<T> const& img,
    int radius
 ) {
    auto kFunc = gauss<int>();
@@ -236,8 +236,8 @@ void lowpassFilter(
    int const kStd = radius/2;
 
    int const chans = img.channels();
-   BitmapImage<float> kernelX(1,kSize,img.channels());
-   BitmapImage<float> kernelY(kSize,1,img.channels());
+   Image<float> kernelX(1,kSize,img.channels());
+   Image<float> kernelY(kSize,1,img.channels());
    float sum = 0.f;
    float val;
    for(int i = 0; i < kSize; ++i) {
@@ -253,7 +253,7 @@ void lowpassFilter(
       }
    }
 
-   BitmapImage<T> tmp(img.rows(), img.cols(), img.channels());
+   Image<T> tmp(img.rows(), img.cols(), img.channels());
    filter(tmp, img, kernelX);
    filter(out, tmp, kernelY);
 }
@@ -264,8 +264,8 @@ void lowpassFilter(
  */
 template<>
 void lowpassFilter(
-   BitmapImage<uint8_t>& out,
-   BitmapImage<uint8_t> const& img,
+   Image<uint8_t>& out,
+   Image<uint8_t> const& img,
    int radius
 ) {
    auto kFunc = gauss<int>();
@@ -274,8 +274,8 @@ void lowpassFilter(
    int const kStd = radius/2;
 
    int const chans = img.channels();
-   BitmapImage<uint8_t> kernelX(1,kSize,img.channels());
-   BitmapImage<uint8_t> kernelY(kSize,1,img.channels());
+   Image<uint8_t> kernelX(1,kSize,img.channels());
+   Image<uint8_t> kernelY(kSize,1,img.channels());
    float sum = 0;
    int val;
    for(int i = 0; i < kSize; ++i) {
@@ -292,7 +292,7 @@ void lowpassFilter(
       }
    }
 
-   BitmapImage<uint8_t> tmp(img.rows(), img.cols(), img.channels());
+   Image<uint8_t> tmp(img.rows(), img.cols(), img.channels());
    filter(tmp, img, kernelX);
    filter(out, tmp, kernelY);
 }
@@ -303,14 +303,14 @@ void lowpassFilter(
  */
 template<class T>
 void gradient(
-   BitmapImage<float>& outDx,
-   BitmapImage<float>& outDy,
-   BitmapImage<T> const& img
+   Image<float>& outDx,
+   Image<float>& outDy,
+   Image<T> const& img
 ) {
 
    int const chans = img.channels();
-   BitmapImage<float> dx(1,3,img.channels());
-   BitmapImage<float> dy(3,1,img.channels());
+   Image<float> dx(1,3,img.channels());
+   Image<float> dy(3,1,img.channels());
 
    dx[0][0*chans + 0] = -0.5f;
    dx[0][2*chans + 0] = 0.5f;
@@ -338,14 +338,14 @@ void gradient(
  * \param[in] maxFlow denominator used to scale flow values for display
  */
 void opticalFlowToRgb(
-   BitmapImage<uint8_t>& rgb,
-   BitmapImage<float>& flow,
+   Image<uint8_t>& rgb,
+   Image<float>& flow,
    float const maxFlow = 2.f
 ){
    int const rows = rgb.rows();
    int const cols = rgb.cols();
 
-   BitmapImage<float> hsv(rows, cols, 3);
+   Image<float> hsv(rows, cols, 3);
    int i,j;
    for( i = 0; i < rows; ++i ) {
       for( j = 0; j < cols; ++j ) {
@@ -376,9 +376,9 @@ void opticalFlowToRgb(
  * \param[in] img1 image frame coming temporally after \c img0
  */
 void hsOpticalFlow(
-   BitmapImage<float>& flow,
-   BitmapImage<float> const& img0,
-   BitmapImage<float> const& img1
+   Image<float>& flow,
+   Image<float> const& img0,
+   Image<float> const& img1
 ) {
    // Patch radius in pixels
    int const radius = 3;
@@ -389,11 +389,11 @@ void hsOpticalFlow(
    float const gamma = 1e-2 * (2*radius+1)*(2*radius+1)*chans;
    int i,j,k;
    int m,n;
-   BitmapImage<float> x0(rows, cols, chans);
-   BitmapImage<float> x1(rows, cols, chans);
-   BitmapImage<float> dx(rows, cols, chans);
-   BitmapImage<float> dy(rows, cols, chans);
-   BitmapImage<float> dt(rows, cols, chans);
+   Image<float> x0(rows, cols, chans);
+   Image<float> x1(rows, cols, chans);
+   Image<float> dx(rows, cols, chans);
+   Image<float> dy(rows, cols, chans);
+   Image<float> dt(rows, cols, chans);
 
    // LPF for noise
    lowpassFilter(x0, img0, 2);

@@ -1,7 +1,7 @@
 #ifndef IMAGEPROCESSINGTEST_H
 #define IMAGEPROCESSINGTEST_H
 
-#include <BitmapImage.h>
+#include <Image.h>
 #include <ImageProcessing.h>
 #include <gtest/gtest.h>
 #include <stdio.h>
@@ -24,13 +24,13 @@ TEST_F(ImageProcessingTest, integrate) {
    // [ 0  1  2 |  3  4  5 |  6  7  8
    //   9 10 11 | 12 13 14 | 15 16 17
    //  18 19 20 | 21 22 23 | 24 25 26]
-   BitmapImage<uint8_t> img(rows, cols, chans);
+   Image<uint8_t> img(rows, cols, chans);
    for( i = 0; i < rows; ++i )
       for( j = 0; j < cols*chans; ++j )
          img[i][j] = j + i*cols*chans;
 
    // Brute-force calculate expected integral image
-   BitmapImage<uint8_t> expectedIntImg(img);
+   Image<uint8_t> expectedIntImg(img);
    for( j = chans; j < cols*chans; ++j )
       expectedIntImg[0][j] += expectedIntImg[0][j-chans];
    for( i = 1; i < rows; ++i ) {
@@ -57,7 +57,7 @@ TEST_F(ImageProcessingTest, integrateSquare) {
    // img:
    // [ 0  1  2
    //   3  4  5 ]
-   BitmapImage<uint8_t> img(rows, cols, chans);
+   Image<uint8_t> img(rows, cols, chans);
    for( i = 0; i < rows; ++i )
       for( j = 0; j < cols*chans; ++j )
          img[i][j] = j + i*cols*chans;
@@ -90,7 +90,7 @@ TEST_F(ImageProcessingTest, filter) {
    // [ 0  2 0
    //   0 -4 0 ]
 
-   BitmapImage<int8_t> img(2,3,1);
+   Image<int8_t> img(2,3,1);
    img[0][0] = 1;
    img[0][1] = 2;
    img[0][2] = 3;
@@ -98,12 +98,12 @@ TEST_F(ImageProcessingTest, filter) {
    img[1][1] = 6;
    img[1][2] = 5;
 
-   BitmapImage<int8_t> kern(1,3,1);
+   Image<int8_t> kern(1,3,1);
    kern[0][0] = -1;
    kern[0][1] = 0;
    kern[0][2] = 1;
 
-   BitmapImage<int8_t> out(2,3,1);
+   Image<int8_t> out(2,3,1);
 
    filter(out, img, kern);
    EXPECT_EQ(out[0][1], 2);
@@ -111,9 +111,9 @@ TEST_F(ImageProcessingTest, filter) {
 }
 
 TEST_F(ImageProcessingTest, lowpassFilter) {
-   BitmapImage<uint8_t> lena(TEST_IMAGE_DIR "lena_gray.pgm");
+   Image<uint8_t> lena(TEST_IMAGE_DIR "lena_gray.pgm");
 
-   BitmapImage<uint8_t> lpf(lena.rows(), lena.cols(), lena.channels());
+   Image<uint8_t> lpf(lena.rows(), lena.cols(), lena.channels());
    lowpassFilter(lpf, lena, 4);
 
    lpf.save("/tmp/lena_lpf");
@@ -124,8 +124,8 @@ TEST_F(ImageProcessingTest, opticalFlowToRgb) {
    int const radius = 32;
    int const rows = 2*radius+1;
    int const cols = rows;
-   BitmapImage<float> flow(rows, cols, 2);
-   BitmapImage<uint8_t> flowRgb(rows, cols, 3);
+   Image<float> flow(rows, cols, 2);
+   Image<uint8_t> flowRgb(rows, cols, 3);
 
    for(int i = 0; i < rows; ++i) {
       for(int j = 0; j < cols; ++j) {
@@ -139,12 +139,12 @@ TEST_F(ImageProcessingTest, opticalFlowToRgb) {
 }
 
 TEST_F(ImageProcessingTest, hsOpticalFlow) {
-   BitmapImage<uint8_t> frame1(TEST_IMAGE_DIR "rubic.0.pgm");
-   BitmapImage<uint8_t> frame2(TEST_IMAGE_DIR "rubic.1.pgm");
-   BitmapImage<float> fframe1;
-   BitmapImage<float> fframe2;
-   BitmapImage<float> flow(frame1.rows(), frame2.cols(), 2);
-   BitmapImage<uint8_t> flowRgb(flow.rows(), flow.cols(), 3);
+   Image<uint8_t> frame1(TEST_IMAGE_DIR "rubic.0.pgm");
+   Image<uint8_t> frame2(TEST_IMAGE_DIR "rubic.1.pgm");
+   Image<float> fframe1;
+   Image<float> fframe2;
+   Image<float> flow(frame1.rows(), frame2.cols(), 2);
+   Image<uint8_t> flowRgb(flow.rows(), flow.cols(), 3);
 
    fframe1.convertFrom(frame1);
    fframe2.convertFrom(frame2);

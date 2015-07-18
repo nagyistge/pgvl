@@ -1,5 +1,5 @@
 SET( PGVL_SRCS
-   BitmapImage.cpp
+   Image.cpp
    ImageProcessing.cpp
    ppm.cpp
 )

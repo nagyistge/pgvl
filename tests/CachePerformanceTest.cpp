@@ -1,12 +1,12 @@
 #include <stdio.h>
 #include "config.h"
-#include <BitmapImage.h>
+#include <Image.h>
 #include <ImageProcessing.h>
 #include <time.h>
 
 int main() {
-   BitmapImage<uint8_t> lena(TEST_IMAGE_DIR "lena_gray.pgm");
-   BitmapImage<uint8_t> lpf(lena.rows(), lena.cols(), lena.channels());
+   Image<uint8_t> lena(TEST_IMAGE_DIR "lena_gray.pgm");
+   Image<uint8_t> lpf(lena.rows(), lena.cols(), lena.channels());
 
    volatile int numLoops = 5;
    clock_t beg = clock();

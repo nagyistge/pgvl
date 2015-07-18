@@ -1,5 +1,5 @@
 SET( PGVL_TEST_SRCS
-   BitmapImageTest.cpp
+   ImageTest.cpp
    ImageProcessingTest.cpp
 )
 
@@ -24,8 +24,8 @@ TARGET_LINK_LIBRARIES(pgvl_cache_test pgvl ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREA
 #================Tests=====================
 
 ADD_TEST(
-   NAME BitmapImageTest
-   COMMAND pgvl_tests --gtest_filter=BitmapImageTest*
+   NAME ImageTest
+   COMMAND pgvl_tests --gtest_filter=ImageTest*
 )
 
 ADD_TEST(

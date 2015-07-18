@@ -4,11 +4,11 @@
 #include <gtest/gtest.h>
 #include "config.h"
 #include <ppm.h>
-#include <BitmapImage.h>
+#include <Image.h>
 
-class BitmapImageTest : public testing::Test {
+class ImageTest : public testing::Test {
 public:
-   BitmapImageTest();
+   ImageTest();
 
    // From class Test
    virtual void SetUp();
@@ -18,7 +18,7 @@ private:
 };
 
 // Test pgm loading
-TEST_F(BitmapImageTest, loadsPgm) {
+TEST_F(ImageTest, loadsPgm) {
    int w = 0;
    int h = 0;
    unsigned char* data = pgmread(TEST_IMAGE_DIR "lena_gray.pgm", &w, &h);
@@ -31,7 +31,7 @@ TEST_F(BitmapImageTest, loadsPgm) {
 }
 
 // Test ppm loading
-TEST_F(BitmapImageTest, loadsPpm) {
+TEST_F(ImageTest, loadsPpm) {
    int w = 0;
    int h = 0;
    int maxval = 0;
@@ -45,25 +45,25 @@ TEST_F(BitmapImageTest, loadsPpm) {
    delete[] data;
 }
 
-// Test BitmapImage loading
-TEST_F(BitmapImageTest, loadsBitmapImage) {
-   BitmapImage<uint8_t> ppm(TEST_IMAGE_DIR "lena.ppm");
+// Test Image loading
+TEST_F(ImageTest, loadsImage) {
+   Image<uint8_t> ppm(TEST_IMAGE_DIR "lena.ppm");
 
    EXPECT_EQ( ppm.rows(), 512 );
    EXPECT_EQ( ppm.cols(), 512 );
 
-   BitmapImage<uint8_t> pgm(TEST_IMAGE_DIR "lena_gray.pgm");
+   Image<uint8_t> pgm(TEST_IMAGE_DIR "lena_gray.pgm");
 
    EXPECT_EQ( pgm.rows(), 512 );
    EXPECT_EQ( pgm.cols(), 512 );
 }
 
 // Ensure saving then loading results in the same data
-TEST_F(BitmapImageTest, loadStore) {
+TEST_F(ImageTest, loadStore) {
    int i,j,k;
-   BitmapImage<uint8_t> lena(TEST_IMAGE_DIR "lena_gray.pgm");
+   Image<uint8_t> lena(TEST_IMAGE_DIR "lena_gray.pgm");
    lena.save("/tmp/pgvl-lena");
-   BitmapImage<uint8_t> lena2("/tmp/pgvl-lena.pgm");
+   Image<uint8_t> lena2("/tmp/pgvl-lena.pgm");
 
    EXPECT_EQ( lena.rows(), lena2.rows() );
    EXPECT_EQ( lena.cols(), lena2.cols() );
@@ -83,9 +83,9 @@ TEST_F(BitmapImageTest, loadStore) {
       std::cerr << "(" << i << ", " << j << ")" << std::endl;
    EXPECT_EQ( false, different );
 
-   BitmapImage<uint8_t> lenaColor(TEST_IMAGE_DIR "lena.ppm");
+   Image<uint8_t> lenaColor(TEST_IMAGE_DIR "lena.ppm");
    lenaColor.save("/tmp/pgvl-lena");
-   BitmapImage<uint8_t> lena3("/tmp/pgvl-lena.ppm");
+   Image<uint8_t> lena3("/tmp/pgvl-lena.ppm");
 
    different = false;
    for( i = 0; i < lenaColor.rows() && !different; ++i ) {
@@ -104,9 +104,9 @@ TEST_F(BitmapImageTest, loadStore) {
    EXPECT_EQ( false, different );
 }
 
-TEST_F(BitmapImageTest, patch) {
-   BitmapImage<uint8_t> lena(TEST_IMAGE_DIR "lena_gray.pgm");
-   BitmapImage<uint8_t> patch;
+TEST_F(ImageTest, patch) {
+   Image<uint8_t> lena(TEST_IMAGE_DIR "lena_gray.pgm");
+   Image<uint8_t> patch;
 
    lena.patch(patch, 1, 5, 1, 5);
 

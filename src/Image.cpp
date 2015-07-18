@@ -1,12 +1,12 @@
 /*
- * BitmapImage.cpp is part of pgvl and is
+ * Image.cpp is part of pgvl and is
  * Copyright 2015 Philip G. Lee <rocketman768@gmail.com>
  */
 
-#include <BitmapImage.h>
+#include <Image.h>
 #include <cmath>
 
-void srgb2rgb(BitmapImage<float>& img) {
+void srgb2rgb(Image<float>& img) {
    int const rows = img.rows();
    int const cols = img.cols();
    int const chans = img.channels();
@@ -27,7 +27,7 @@ void srgb2rgb(BitmapImage<float>& img) {
    }
 }
 
-void rgb2srgb(BitmapImage<float>& img) {
+void rgb2srgb(Image<float>& img) {
    int const rows = img.rows();
    int const cols = img.cols();
    int const chans = img.channels();
@@ -48,7 +48,7 @@ void rgb2srgb(BitmapImage<float>& img) {
    }
 }
 
-void rgb2hsl(BitmapImage<float>& img) {
+void rgb2hsl(Image<float>& img) {
    float r,g,b;
    float vmax, vmin;
    float h,s,l;
@@ -90,7 +90,7 @@ void rgb2hsl(BitmapImage<float>& img) {
    }
 }
 
-void hsl2rgb(BitmapImage<float>& img) {
+void hsl2rgb(Image<float>& img) {
    float r,g,b;
    float h,s,l;
    float c, x, m;
@@ -138,7 +138,7 @@ void hsl2rgb(BitmapImage<float>& img) {
    }
 }
 
-void rgb2hsv(BitmapImage<float>& img) {
+void rgb2hsv(Image<float>& img) {
    float r,g,b;
    float h,s,v;
 
@@ -176,7 +176,7 @@ void rgb2hsv(BitmapImage<float>& img) {
    }
 }
 
-void hsv2rgb(BitmapImage<float>& img) {
+void hsv2rgb(Image<float>& img) {
    float r,g,b;
    float h,s,v;
    float c, x, m;
