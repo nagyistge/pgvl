@@ -6,6 +6,48 @@
 #include <BitmapImage.h>
 #include <cmath>
 
+void srgb2rgb(BitmapImage<float>& img) {
+   int const rows = img.rows();
+   int const cols = img.cols();
+   int const chans = img.channels();
+
+   auto convert = [](float& c) -> void {
+      if( c <= 0.04045f )
+         c /= 12.92f;
+      else
+         c = powf((c+0.055f)/(1.f+0.055f), 2.4f);
+   };
+
+   for(int i = 0; i < rows; ++i) {
+      for(int j = 0; j < cols; ++j) {
+         for(int k = 0; k < chans; ++k) {
+            convert(img[i][j*chans+k]);
+         }
+      }
+   }
+}
+
+void rgb2srgb(BitmapImage<float>& img) {
+   int const rows = img.rows();
+   int const cols = img.cols();
+   int const chans = img.channels();
+
+   auto convert = [](float& c) -> void {
+      if( c <= 0.0031308f )
+         c *= 12.92f;
+      else
+         c = (1.f+0.055f)*powf(c, 1.f/2.4f) - 0.055f;
+   };
+
+   for(int i = 0; i < rows; ++i) {
+      for(int j = 0; j < cols; ++j) {
+         for(int k = 0; k < chans; ++k) {
+            convert(img[i][j*chans+k]);
+         }
+      }
+   }
+}
+
 void rgb2hsl(BitmapImage<float>& img) {
    float r,g,b;
    float vmax, vmin;

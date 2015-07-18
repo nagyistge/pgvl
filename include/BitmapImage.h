@@ -302,6 +302,8 @@ private:
    }
 };
 
+void rgb2srgb(BitmapImage<float>& img);
+void srgb2rgb(BitmapImage<float>& img);
 void rgb2hsl(BitmapImage<float>& img);
 void hsl2rgb(BitmapImage<float>& img);
 void rgb2hsv(BitmapImage<float>& img);
