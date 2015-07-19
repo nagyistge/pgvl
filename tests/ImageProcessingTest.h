@@ -152,6 +152,48 @@ TEST_F(ImageProcessingTest, hsOpticalFlow) {
    opticalFlowToRgb(flowRgb, flow);
 
    flowRgb.save("/tmp/flow");
+
+   // Just for funsies, try out the SDL stuff ---------------------------------
+
+   // Initialize SDL for video junk
+   SDL_Init( SDL_INIT_VIDEO );
+
+   // Create the window in which to display lena
+   SDL_Window* window = SDL_CreateWindow(
+      "Horn-Schunck Flow",
+      SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+      frame1.cols(), frame1.rows(),
+      SDL_WINDOW_SHOWN
+   );
+   // Create an accelerated renderer for the window
+   SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+   // Convert Image to SDL_Texture for rendering
+   SDL_Surface* imageSurface = toSurface(frame1);
+   SDL_Texture* imageTexture = SDL_CreateTextureFromSurface(renderer, imageSurface);
+   SDL_FreeSurface(imageSurface);
+
+   SDL_RenderClear(renderer);
+   SDL_RenderCopy(renderer, imageTexture, NULL, NULL);
+
+   // Draw green lines indicating optical flow direction
+   SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+   int const drawWidth = 8;
+   float const flowScale = 10.f;
+   for(int i = 0; i < frame1.rows(); i += drawWidth) {
+      for(int j = 0; j < frame1.cols(); j += drawWidth) {
+         SDL_RenderDrawLine(renderer, j, i, j+flowScale*flow[i][j*2+0]+0.5f, i+flowScale*flow[i][j*2+1]+0.5f);
+      }
+   }
+
+   // Display for 10 seconds
+   SDL_RenderPresent(renderer);
+   SDL_Delay(10000);
+
+   // Cleanup
+   SDL_DestroyTexture(imageTexture);
+   SDL_DestroyRenderer(renderer);
+   SDL_DestroyWindow(window);
+   SDL_Quit();
 }
 
 #endif /*IMAGEPROCESSINGTEST_H*/
