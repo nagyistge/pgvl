@@ -6,11 +6,6 @@
 // Number of bytes in a cache line
 #define CACHE_LINE_SIZE 64
 
-#define LOGE(msg) \
-   do { \
-      std::cerr << "pgvl - " << __func__ << "(): " << msg << std::endl; \
-   } while(0); \
-
 // Location of test images
 #define TEST_IMAGE_DIR "${PROJECT_SOURCE_DIR}/tests/images/"
 

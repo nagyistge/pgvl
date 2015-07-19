@@ -6,6 +6,7 @@
 #ifndef IMAGE_H
 #define IMAGE_H
 
+#include <pgvl.h>
 #include <functional>
 #include <string>
 #include <regex>
@@ -304,6 +305,10 @@ private:
 
 /*!
  * \brief Create an SDL surface for image rendering
+ *
+ * If the image is RGB or grayscale, returns a surface ready to render.
+ *
+ * \param[in] img the image to convert to a surface
  */
 SDL_Surface* toSurface(Image<uint8_t>& img);
 
